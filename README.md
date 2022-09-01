@@ -27,7 +27,33 @@ Apart from python, all the other packages are optional for the user to install. 
 
    Type `pip install pandas` in the Terminal (Linux and Windows)
    
-   to be continued...probably all these can be installed from the terminal window in Rstudio, for Windows users
+   **to be continued**...probably all these can be installed from the terminal window in Rstudio, for Windows users
    
-### Running the pipeline
+## Running the pipeline
 
+XXXXX performs two major tasks of analysis: 1) Detection of homozygous regions (Runs Of Homozygosity; ROH) in the parental line of the segregating population, and 2) Pairwise individual comparison in the population for detecting complementary pairs of individuals.
+
+To see all the avaiable options for running the pipeline, type `python3 XXXXXX.py -h`:
+
+```
+usage: resynthesis_master_noImpute.py [-h] [--vcf VCF FILE] [--results_dir STR] [--genos TAB FILE] [--markers TAB FILE] [--not_phased] [--scores_file FILE] [--filter_invariable FLOAT] [--hetero FLOAT]
+
+Detection of ROH regions and analysis of F2 genotyping data for detection of highly complementary individuals.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --vcf VCF FILE        Name of the VCF file for the line, for which the ROH regions will be detected.
+  --results_dir STR     Name of the results directory [Default: ROH_results]
+  --genos TAB FILE      Tab-delimited file (.tab) containing the genotyping data of the F2 population. Markers should be in columns and individuals in rows. Genotypes should be in the format "A,B,H,-", where
+                        "-" represents missing data. Incomapatible with --vcf. This arguments is used together with --markers
+  --markers TAB FILE    A 2-column tab-delimited file with the markers used for the F2 genotyping, in the format of "chromosome<tab>marker name". Incombatible with "--vcf"
+  --not_phased          Use this argument if your genotyping data are not phased. [Default: FALSE]
+  --scores_file FILE    A tab delimited file containing user-defined scores for the different combinations of genotypes, observed during the comparison of the individuals. Nucleotides ingenotypes should be
+                        separated with a "/". e.g.: A/H<tab>0.75. [Default: scores_default.tab]
+  --filter_invariable FLOAT
+                        Keep individual pairs that have a percentage of AA or BB combinations that is lower than the argument value. [Default: 0.1]
+  --hetero FLOAT        Keep individuals that have a heterozygosity lower than the argument value. [Default: 0.5]
+
+```
+
+Pipeline accepts two inputs, both mutually exclusi
