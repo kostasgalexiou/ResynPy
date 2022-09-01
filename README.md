@@ -68,12 +68,42 @@ During this process the genotypic profile of each individual is compared with th
 ##### Mandatory arguments
 
 `--genos`: a tab-delimited file with individuals in rows and markers in columns. Individual column should have a title. Data should be in A, B, H format; i.e. "A" represents the homogyzous genotype for one allele, "B" the homozygous genotype for the other allele and "H" the heterozygous genotype. Missing data should be represented as "-".
+
+   - example of genotyping data.
+
+         indv	SNP1	SNP2  SNP3  SNP4  SNP5  SNP6  SNP7  SNP8  SNP9  SNP10 ...
+         indv_1	A	-	A	-	B	A	A	H	B	B	...
+         indv_2	A	-	B	-	B	H	B	H	H	H	...
+         indv_3	A	-	H	-	B	A	B	A	H	B	...
+         indv_4	B	-	H	-	A	H	H	A	H	B	...
+         ...      ....
+         indv_n	A	-	H	-	H	H	A	H	A	A	...
+
+
 `--markers`: a 2-column tab-delimited file. Column 1: marker name used for genotyping the population. Column 2: chromosome the marker belongs to. File should be sorted by chromosome.
 
-##### Optinal arguments
+##### Optional arguments
 
 `--not_phased`: this argument should be used we used if genotyping data are not phased. The use of this argument will cause the omitance of recombination information in the output file (see _Output data_ Section).
-`--scores_file`: a 2-column tab-delimited file containing scores assigned to each genotype pair. Column 1: genotype pair, Column 2: score. If no file is provided, the pipeline will use the score information present inside file `scores_default.tab`, present in the repository's main directory.
+
+`--scores_file`: a 2-column tab-delimited file containing scores assigned to each possible genotype combination, when two individuals are compared. Column 1: genotype pair, Column 2: score. If no file is provided, the pipeline will use the score information present inside file `scores_default.tab`, provided in the repository's main directory.
+
+   - contents of `scores_default.tab`:
+
+         A/A	0
+         B/B	0
+         -/-	0.5
+         H/H	0.5
+         H/-	0.625
+         A/-	0.75
+         B/-	0.75
+         A/H	0.75
+         B/H	0.75
+         A/B	1
+
+`--filter_invariable`: we also offer the possibility to filter out pairs of individuals that have a number of genotype identities (A/A or B/B) higher than the threshold float value set by this argument. The use of this argument can speed up the whole comparison process, since the pipeline does not proceed to score assignment if the pair is to be discarded. In theory, there shouldn't be any genotype identity between the two individuals, since the presence of genotype identity implies that the corresponding region of the genome will not contribute to obtaining the near-identical variety when thw two individuals are crossed. Therefore, the value of this argument should be as low as possible.
+
+`--hetero`: a value defining the maximum level of heterozygosity for any indvidual in the pair. Low heterozygosity of an individual increases the probability to find
 
 ### ROH detection
 
