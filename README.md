@@ -32,12 +32,12 @@ Apart from python, all the other packages are optional for the user to install. 
    
 ## Running the pipeline
 
-XXXXX offers to the user two tasks of analysis: 1) Pairwise individual comparison in the genotyping data of a segragating population for detecting complementary pairs of individuals, and 2) Detection of homozygous regions (Runs Of Homozygosity; ROH) in the parental line of the segregating population and annotation of the corresponding markers based on their presence inside or outside of ROH.
+ResynPy offers to the user two tasks of analysis: 1) Pairwise individual comparison of the genotyping data of a segragating population for detecting complementary pairs of individuals, and 2) Detection of homozygous regions (Runs Of Homozygosity; ROH) in the parental line of the segregating population and annotation of the corresponding markers based on their presence inside or outside of ROH.
 
-To see all the avaiable options for running the pipeline, type `python3 XXXXXX.py -h`:
+To see all the avaiable options for running the pipeline, type `python3 ResynPy.py -h`:
 
 ```
-usage: resynthesis_master_noImpute.py [-h] [--vcf VCF FILE] [--results_dir STR] [--genos TAB FILE] [--markers TAB FILE] [--not_phased] [--scores_file FILE] [--filter_invariable FLOAT] [--hetero FLOAT]
+usage: ResynPy.py [-h] [--vcf VCF FILE] [--results_dir STR] [--genos TAB FILE] [--markers TAB FILE] [--not_phased] [--scores_file FILE] [--filter_invariable FLOAT] [--hetero FLOAT]
 
 Detection of ROH regions and analysis of F2 genotyping data for detection of highly complementary individuals.
 
@@ -60,7 +60,7 @@ optional arguments:
 
 ### Pairwise comparison
 
-During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the segregating population and the process is completed when all the possible one-way pairwise comparisons are made. For this type of analysis the user must provide a file with the genotyping data (`--genos`), a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
+During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the segregating population and the process is completed when all the possible one-way pairwise comparisons are made. For this type of analysis the user must provide a file with the genotyping data (`--genos`) and a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
 
 #### Input data
 
