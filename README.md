@@ -26,7 +26,7 @@ Apart from python, all the other packages are optional for the user to install. 
       
 2. **Pandas, matplotlib and seaborn installation**
 
-   Type `pip install pandas` in the Terminal (Linux and Windows)
+   Once you have Python installed, type `pip install pandas` in the Terminal (Linux and Windows) to install [Pandas](https://pandas.pydata.org/) python library
    
    **to be continued**...probably all these can be installed from the terminal window in Rstudio, for Windows users
    
