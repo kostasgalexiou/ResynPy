@@ -106,67 +106,67 @@ During this process the genotypic profile of each individual is compared with th
 
 #### Output data
 
-1. `selected_pairs.tab`
+- `selected_pairs.tab`
 
-File containing all the accepted pairs of individuals. This file can contain up to seven columns.
+   File containing all the accepted pairs of individuals. This file can contain up to seven columns.
 
-column 1: selected pair of individuals
+   column 1: selected pair of individuals
 
-column 2: total score of genotyping
+   column 2: total score of genotyping
 
-column 3: number of AA genotype pairs
+   column 3: number of AA genotype pairs
 
-column 4: number of BB genotype pairs
+   column 4: number of BB genotype pairs
 
-column 5: number of recombinations present in the first individual
+   column 5: number of recombinations present in the first individual
 
-column 6: number of recombinations present in the second individual
+   column 6: number of recombinations present in the second individual
 
-column 7: total number of recombinations in the pair
+   column 7: total number of recombinations in the pair
 
-The last four columns are included in the output if data are phased.
+   The last four columns are included in the output if data are phased.
 
-Example of output file for unphased data:
+   Example of output file for _unphased_ data:
 
-```
-#indiv_pair	score	AA pairs	BB pairs
-PR20CG15-1840-1675|PR20CG15-1840-3523	22.5	0	0
-PR20CG15-1840-059|PR20CG15-1840-1911	22.25	0	0
-PR20CG15-1840-2382|PR20CG15-1840-3853	22.25	0	0
-PR20CG15-1840-1717|PR20CG15-1840-3848	22.0	0	0
-PR20CG15-1840-1872|PR20CG15-1840-3288	22.0	0	0
-PR20CG15-1840-1872|PR20CG15-1840-3433	22.0	0	0
-PR20CG15-1840-1455|PR20CG15-1840-3588	21.875	0	0
-```
+   ```
+   #indiv_pair	score	AA pairs	BB pairs
+   PR20CG15-1840-1675|PR20CG15-1840-3523	22.5	0	0
+   PR20CG15-1840-059|PR20CG15-1840-1911	22.25	0	0
+   PR20CG15-1840-2382|PR20CG15-1840-3853	22.25	0	0
+   PR20CG15-1840-1717|PR20CG15-1840-3848	22.0	0	0
+   PR20CG15-1840-1872|PR20CG15-1840-3288	22.0	0	0
+   PR20CG15-1840-1872|PR20CG15-1840-3433	22.0	0	0
+   PR20CG15-1840-1455|PR20CG15-1840-3588	21.875	0	0
+   ```
 
-Example of output file for unphased data:
+   Example of output file for _phased_ data:
 
-```
-#indiv_pair	score	AA pairs	BB pairs	recomb_no1	recomb_no2	sum_recomb
-PR20CG15-1840-1675|PR20CG15-1840-3523	22.5	0	0	0	0	0
-PR20CG15-1840-059|PR20CG15-1840-1911	22.25	0	0	0	0	0
-PR20CG15-1840-2382|PR20CG15-1840-3853	22.25	0	0	0	0	0
-PR20CG15-1840-1717|PR20CG15-1840-3848	22.0	0	0	0	0	0
-PR20CG15-1840-1872|PR20CG15-1840-3288	22.0	0	0	0	0	0
-PR20CG15-1840-1872|PR20CG15-1840-3433	22.0	0	0	0	0	0
-PR20CG15-1840-1455|PR20CG15-1840-3588	21.875	0	0	0	0	0
-```
+   ```
+   #indiv_pair	score	AA pairs	BB pairs	recomb_no1	recomb_no2	sum_recomb
+   PR20CG15-1840-1675|PR20CG15-1840-3523	22.5	0	0	0	0	0
+   PR20CG15-1840-059|PR20CG15-1840-1911	22.25	0	0	0	0	0
+   PR20CG15-1840-2382|PR20CG15-1840-3853	22.25	0	0	0	0	0
+   PR20CG15-1840-1717|PR20CG15-1840-3848	22.0	0	0	0	0	0
+   PR20CG15-1840-1872|PR20CG15-1840-3288	22.0	0	0	0	0	0
+   PR20CG15-1840-1872|PR20CG15-1840-3433	22.0	0	0	0	0	0
+   PR20CG15-1840-1455|PR20CG15-1840-3588	21.875	0	0	0	0	0
+   ```
 
-2. `discarded_individuals_and_pairs.tab`
+- `discarded_individuals_and_pairs.tab`
 
-File containing all individuals and/or pairs that have not met the filters set by the user, supplemented with the parameter that did not meet the criteria and its value.
+   File containing all individuals and/or pairs that have not met the filters set by the user, supplemented with the parameter that did not meet the criteria and its value.
 
-```
-PR20CG15-1840-3988	heterozygosity: 0.43
-PR20CG15-1840-3995	heterozygosity: 0.46
-PR20CG15-1840-002|PR20CG15-1840-003	invariable genotype ratio: 0.27
-PR20CG15-1840-002|PR20CG15-1840-004	invariable genotype ratio: 0.23
-PR20CG15-1840-002|PR20CG15-1840-204	pair score: 19.75
-```
+   ```
+   PR20CG15-1840-3988	heterozygosity: 0.43
+   PR20CG15-1840-3995	heterozygosity: 0.46
+   PR20CG15-1840-002|PR20CG15-1840-003	invariable genotype ratio: 0.27
+   PR20CG15-1840-002|PR20CG15-1840-004	invariable genotype ratio: 0.23
+   PR20CG15-1840-002|PR20CG15-1840-204	pair score: 19.75
+   ```
 
-3. `PairComparison.log`
+- `PairComparison.log`
 
-Log file with the arguments used by the user and the different steps run by the pipeline. When the user runs again the pipeline the file is appended with the new information, so that the user can have a calendar of the different runs that can serve for evaluating the different parameters of the pipeline.
+   Log file with the arguments used by the user and the different steps run by the pipeline. When the user runs again the pipeline the file is appended with the new information, so that the user can have a calendar of the different runs that can serve for evaluating the different parameters of the pipeline.
 
 
 ### ROH detection
@@ -178,3 +178,10 @@ In the case where a user has not yet decided on the set of markers that will be 
 ##### Mandatory arguments
 
 --vcf: VCF file containing SNPs of the elite line for which a segregating population will be generated.
+
+#### Output data
+
+- `markers_region-anno.tab`
+
+
+
