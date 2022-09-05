@@ -183,5 +183,36 @@ In the case where a user has not yet decided on the set of markers that will be 
 
 - `markers_region-anno.tab`
 
+   column 1: chromosome ID
+   
+   column 2: SNP position
+   
+   column 3: Reference allele
+   
+   column 4: Alternative allele
+   
+   column 5: type of region (ROH; noROH)
 
+   Example file:
 
+      chrom	pos	ref	alt	region
+      ...
+      Pp01	1390624	T	C	ROH
+      Pp01	1390645	T	C	ROH
+      Pp01	1791110	G	A	ROH
+      Pp01	1791313	C	T	noROH
+      Pp01	1815867	C	T	noROH
+      Pp01	1830548	C	T	noROH
+      ...
+
+- `ROH_G30`
+
+   `bcftools roh` command output. By default, we use allele frequency of 0.4 since we are interested in differentiating between highly heterozogygous (noROH) and high homozygous (ROH) regions.
+
+- `ROH.png`
+
+   A scatter plot across the different chromosomes showing SNPs located in ROH and noROH regions. To generate the plot we use the information saved in file `markers_region-anno.tab`. This kind of plot is called [stripplot](https://seaborn.pydata.org/generated/seaborn.stripplot.html).
+   
+- `bcftools_roh-detection.log`
+
+   Log file with the argument values used by the user, together with all the steps applied by the pipeline, with their associated commands.
