@@ -104,8 +104,77 @@ During this process the genotypic profile of each individual is compared with th
 
 `--hetero`: a value defining the maximum level of heterozygosity for any indvidual in the pair. Low heterozygosity of an individual increases the probability to find a matching individual with a complementary genotype in the following generation, within a small pool....XXXXXX 
 
+#### Output data
+
+1. `selected_pairs.tab`
+
+File containing all the accepted pairs of individuals. This file can contain up to seven columns.
+
+column 1: selected pair of individuals
+
+column 2: total score of genotyping
+
+column 3: number of AA genotype pairs
+
+column 4: number of BB genotype pairs
+
+column 5: number of recombinations present in the first individual
+
+column 6: number of recombinations present in the second individual
+
+column 7: total number of recombinations in the pair
+
+The last four columns are included in the output if data are phased.
+
+Example of output file for unphased data:
+
+```
+#indiv_pair	score	AA pairs	BB pairs
+PR20CG15-1840-1675|PR20CG15-1840-3523	22.5	0	0
+PR20CG15-1840-059|PR20CG15-1840-1911	22.25	0	0
+PR20CG15-1840-2382|PR20CG15-1840-3853	22.25	0	0
+PR20CG15-1840-1717|PR20CG15-1840-3848	22.0	0	0
+PR20CG15-1840-1872|PR20CG15-1840-3288	22.0	0	0
+PR20CG15-1840-1872|PR20CG15-1840-3433	22.0	0	0
+PR20CG15-1840-1455|PR20CG15-1840-3588	21.875	0	0
+```
+
+Example of output file for unphased data:
+
+```
+#indiv_pair	score	AA pairs	BB pairs	recomb_no1	recomb_no2	sum_recomb
+PR20CG15-1840-1675|PR20CG15-1840-3523	22.5	0	0	0	0	0
+PR20CG15-1840-059|PR20CG15-1840-1911	22.25	0	0	0	0	0
+PR20CG15-1840-2382|PR20CG15-1840-3853	22.25	0	0	0	0	0
+PR20CG15-1840-1717|PR20CG15-1840-3848	22.0	0	0	0	0	0
+PR20CG15-1840-1872|PR20CG15-1840-3288	22.0	0	0	0	0	0
+PR20CG15-1840-1872|PR20CG15-1840-3433	22.0	0	0	0	0	0
+PR20CG15-1840-1455|PR20CG15-1840-3588	21.875	0	0	0	0	0
+```
+
+2. `discarded_individuals_and_pairs.tab`
+
+File containing all individuals and/or pairs that have not met the filters set by the user, supplemented with the parameter that did not meet the criteria and its value.
+
+```
+PR20CG15-1840-3988	heterozygosity: 0.43
+PR20CG15-1840-3995	heterozygosity: 0.46
+PR20CG15-1840-002|PR20CG15-1840-003	invariable genotype ratio: 0.27
+PR20CG15-1840-002|PR20CG15-1840-004	invariable genotype ratio: 0.23
+PR20CG15-1840-002|PR20CG15-1840-204	pair score: 19.75
+```
+
+3. `PairComparison.log`
+
+Log file with the arguments used by the user and the different steps run by the pipeline. When the user runs again the pipeline the file is appended with the new information, so that the user can have a calendar of the different runs that can serve for evaluating the different parameters of the pipeline.
+
+
 ### ROH detection
 
 In the case where a user has not yet decided on the set of markers that will be used for screening the segregating population, ResynPy pipeline is providing an additional functionality that is to detect regions of homozygosity (Runs Of Homozygosity; ROH) from a VCF file resulted from the analysis of resequencing data from the elite cultivar line. The output of this process is a tab-delimited file containing the annotation of each marker based on its presence inside a ROH region or not.
 
-The input file for ROH detection is a VCF file containing SNPs (not INDELs) of the individual that will be the parent of the segregating population
+#### Input data
+
+##### Mandatory arguments
+
+--vcf: VCF file containing SNPs of the elite line for which a segregating population will be generated.
