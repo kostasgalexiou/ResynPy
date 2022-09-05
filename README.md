@@ -32,7 +32,7 @@ Apart from python, all the other packages are optional for the user to install. 
    
 ## Running the pipeline
 
-XXXXX offers to the user two tasks of analysis: 1) Pairwise individual comparison in the genotyping data of a segragating population for detecting complementary pairs of individuals, and 2) Detection of homozygous regions (Runs Of Homozygosity; ROH) in the parental line of the segregating population.
+XXXXX offers to the user two tasks of analysis: 1) Pairwise individual comparison in the genotyping data of a segragating population for detecting complementary pairs of individuals, and 2) Detection of homozygous regions (Runs Of Homozygosity; ROH) in the parental line of the segregating population and annotation of the corresponding markers based on their presence inside or outside of ROH.
 
 To see all the avaiable options for running the pipeline, type `python3 XXXXXX.py -h`:
 
@@ -57,7 +57,6 @@ optional arguments:
   --vcf VCF FILE        Name of the VCF file for the line, for which the ROH regions will be detected.
 
 ```
-
 
 ### Pairwise comparison
 
@@ -107,6 +106,6 @@ During this process the genotypic profile of each individual is compared with th
 
 ### ROH detection
 
-In the case where a user has not yet decided on the set of markers that will be used for screening the segregating population, ResynPy pipeline is providing an additional functionality that is to detect regions of homozygosity (Runs Of Homozygosity; ROH) from a VCF file containing resequencing data from the elite cultivar line. These regions are uninformative for 
+In the case where a user has not yet decided on the set of markers that will be used for screening the segregating population, ResynPy pipeline is providing an additional functionality that is to detect regions of homozygosity (Runs Of Homozygosity; ROH) from a VCF file resulted from the analysis of resequencing data from the elite cultivar line. The output of this process is a tab-delimited file containing the annotation of each marker based on its presence inside a ROH region or not.
 
 The input file for ROH detection is a VCF file containing SNPs (not INDELs) of the individual that will be the parent of the segregating population
