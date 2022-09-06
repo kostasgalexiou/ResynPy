@@ -57,8 +57,6 @@ optional arguments:
                         Keep individual pairs that have a percentage of AA or BB combinations that is lower than the argument value. [Default: 0.1]
   --hetero FLOAT        Keep individuals that have a heterozygosity lower than the argument value. [Default: 0.5]
 
-  --vcf VCF FILE        Name of the VCF file for the line, for which the ROH regions will be detected.
-
 ```
 
 ### Pairwise comparison
