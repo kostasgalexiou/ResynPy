@@ -177,7 +177,7 @@ During this process the genotypic profile of each individual is compared with th
    
 - `PairComparison.log`
 
-   Log file with the arguments used by the user and the different steps run by the pipeline. When the user runs again the pipeline the file is appended with the new information, so that the user can have a calendar of the different runs that can serve for evaluating the different parameters of the pipeline.
+   Log file with the arguments used by the user and the different steps run by the pipeline. When the user runs again the pipeline the file is appended with the new information. This can help the user to evaluate different parameters of the pipeline.
 
 
 ## THE TEXT BELOW WILL MOST PROBABLY BE DISCARDED
