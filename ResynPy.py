@@ -55,9 +55,6 @@ def parse_arguments():
                         help='Keep individuals that have a heterozygosity lower than the argument value. '
                              '[Default: 0.5]')
 
-    parser.add_argument('--vcf', metavar='VCF FILE', help='Name of the VCF file for the line, for which the ROH '
-                                                          'regions will be detected.')
-
     variables = vars(parser.parse_args())
 
     return parser.parse_args(), variables
