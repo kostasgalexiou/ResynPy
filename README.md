@@ -61,7 +61,7 @@ optional arguments:
 
 ### Pairwise comparison
 
-During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the segregating population. Every time a comparison is made, the pipeline outputs a specific score for the pair of individuals analyzed and the process is completed when all the possible one-way pairwise comparisons are made. For this type of analysis the user must provide a file with the genotyping data (`--genos`) and a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
+During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the segregating population. Each pair of genotypes in a specific marker has a score assigned to it. Scores for each combination of genotypes is provided in the file `scores_default.tab`, which the user can modify if he/she wants to assign different weight to each genotype pair (see below). Every time a comparison is made, the pipeline outputs the sum of the genotype-specific scores for the pair of individuals analyzed and the process is completed when all the possible one-way pairwise comparisons are made. For this type of analysis the user must provide a file with the genotyping data (`--genos`) and a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
 
 - Example of command:
 
