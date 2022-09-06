@@ -61,7 +61,7 @@ optional arguments:
 
 ### Pairwise comparison
 
-During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the segregating population. Each pair of genotypes in a specific marker has a score assigned to it. Scores for each combination of genotypes is provided in the file `scores_default.tab`, which the user can modify if he/she wants to assign different weight to each genotype pair (see below). Every time a comparison is made, the pipeline outputs the sum of the genotype-specific scores for the pair of individuals analyzed and the process is completed when all the possible one-way pairwise comparisons are made. For this type of analysis the user must provide a file with the genotyping data (`--genos`) and a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
+During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the segregating population. Each pair of genotypes in a specific marker has a score assigned to it. Scores for each combination of genotypes is provided in the file `scores_default.tab`. The user can also provide a tab-delimited file with different scores (see below). Every time a comparison is made, the pipeline outputs the sum of the genotype-specific scores for the pair of individuals analyzed and the process is completed when all the possible one-way pairwise comparisons are made. For this type of analysis the user must provide a file with the genotyping data (`--genos`) and a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
 
 - Example of command:
 
@@ -90,9 +90,9 @@ During this process the genotypic profile of each individual is compared with th
 
 ##### Optional arguments
 
-`--not_phased`: this argument should be used we used if genotyping data are not phased. The use of this argument will cause the omitance of recombination information in the output file (see _Output data_ Section).
+`--not_phased`: this argument should be used if genotyping data are not phased. The use of this argument will cause the exclusion of recombination information in the output file (see _Output data_ Section).
 
-`--scores_file`: a 2-column tab-delimited file containing scores assigned to each possible genotype combination, when two individuals are compared. Column 1: genotype pair, Column 2: score. If no file is provided, the pipeline will use the score information present inside file `scores_default.tab`, provided in the repository's main directory.
+`--scores_file`: A 2-column tab-delimited file containing scores assigned to each possible genotype combination, when two individuals are compared. Column 1: genotype pair, Column 2: score. By default, the pipeline will use the score information present inside file `scores_default.tab`, provided in the repository's main directory. However if the user wants to apply different scoring, a tab-delimited file should be provided by using this argument. 
 
    - contents of `scores_default.tab`:
 
