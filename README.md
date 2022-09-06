@@ -178,6 +178,7 @@ During this process the genotypic profile of each individual is compared with th
    Log file with the arguments used by the user and the different steps run by the pipeline. When the user runs again the pipeline the file is appended with the new information, so that the user can have a calendar of the different runs that can serve for evaluating the different parameters of the pipeline.
 
 
+## THE TEXT BELOW WILL MOST PROBABLY BE DISCARDED
 ### ROH detection
 
 In the case where a user has not yet decided on the set of markers that will be used for screening the segregating population, ResynPy pipeline is providing an additional functionality that is to detect regions of homozygosity (Runs Of Homozygosity; ROH) from a VCF file resulted from the analysis of resequencing data from the elite cultivar line. The output of this process is a tab-delimited file containing the annotation of each marker based on its presence inside a ROH region or not.
