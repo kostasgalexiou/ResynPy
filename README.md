@@ -68,7 +68,7 @@ During this process the genotypic profile of each individual is compared with th
 - Example of command:
 
    ```
-   python3 ResynPy.py --genos SD_F2data.tab \
+   python ResynPy.py --genos SD_F2data.tab \
    --markers SDmarkers.tab \
    --scores_file scores_default.tab \
    --results_dir SD_results \
