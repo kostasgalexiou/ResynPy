@@ -61,7 +61,7 @@ optional arguments:
 
 ### Pairwise comparison
 
-During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the segregating population and the process is completed when all the possible one-way pairwise comparisons are made. For this type of analysis the user must provide a file with the genotyping data (`--genos`) and a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
+During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the segregating population. Every time a comparison is made, the pipeline outputs a specific score for the pair of individuals analyzed and the process is completed when all the possible one-way pairwise comparisons are made. For this type of analysis the user must provide a file with the genotyping data (`--genos`) and a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
 
 - Example of command:
 
