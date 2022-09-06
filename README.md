@@ -131,7 +131,7 @@ During this process the genotypic profile of each individual is compared with th
 
    column 7: total number of recombinations in the pair
 
-   The last four columns are included in the output if data are phased.
+   _#### The last three columns are included in the output if data are phased._
 
    Example of output file for _unphased_ data:
 
@@ -173,7 +173,7 @@ During this process the genotypic profile of each individual is compared with th
 
 - `selected_pairs.png`
 
-   A figure showing the haplotypes of the individuals in the first selected pairs, in a color-coded manner.
+   A figure showing the haplotypes of the individuals in the first 10 selected pairs, in a color-coded manner (Pending...).
    
 - `PairComparison.log`
 
