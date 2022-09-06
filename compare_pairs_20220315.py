@@ -166,19 +166,23 @@ def main():
                         out.writelines('\t'.join(('|'.join((new_content[indv1][0], new_content[indv2][0])),
                                                   str(score_pair), str(aa_counts), str(bb_counts) + '\n')))
 
-    if phased == 'yes':
-        command1 = ' '.join(('sort -g -k2,2r -k7,7nr', outfile, '>', 'x'))
-    elif phased == 'no':
-        command1 = ' '.join(('sort -g -k2,2r', outfile, '>', 'x'))
+    if sys.platform == "linux" or sys.platform == "linux2":
+        if phased == 'yes':
+            command1 = ' '.join(('sort -g -k2,2r -k7,7nr', outfile, '>', 'x'))
+        elif phased == 'no':
+            command1 = ' '.join(('sort -g -k2,2r', outfile, '>', 'x'))
 
-    os.system(command1)
+        os.system(command1)
+        logfile(results_folder, '\n' + '\t' + command1 + '\n')
+        command2 = ' '.join(('mv x', outfile))
+        os.system(command2)
+        logfile(results_folder, '\t' + command2 + '\n\n')
 
-    logfile(results_folder, '\n' + '\t' + command1 + '\n')
+    elif sys.platform == 'win32':
+        print('\n\tPlease order manually file "individual_genetic_distance.tab" based on the score column\n')
 
-    command2 = ' '.join(('mv x', outfile))
-    os.system(command2)
 
-    logfile(results_folder, '\t' + command2 + '\n\n')
+
 
 
 if __name__ == '__main__':
