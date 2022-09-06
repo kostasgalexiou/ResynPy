@@ -30,14 +30,14 @@ Apart from python, all the other packages are optional for the user to install. 
    install [matplotlib](https://matplotlib.org/): `pip install matplotlib`
    
    install [seaborn](https://seaborn.pydata.org/): `pip install seaborn`
-   
-   **to be continued**...probably all these can be installed from the terminal window in Rstudio, for Windows users
 
 ## Running the pipeline
 
-ResynPy offers to the user two tasks of analysis: 1) Pairwise individual comparison of the genotyping data of a segragating population for detecting complementary pairs of individuals, and 2) Detection of homozygous regions (Runs Of Homozygosity; ROH) in the parental line of the segregating population and annotation of the corresponding markers based on their presence inside or outside of ROH.
+ResynPy performs pairwise individual comparison of the genotyping data of a segragating population for detecting complementary pairs of individuals.
 
-To see all the avaiable options for running the pipeline, type `python3 ResynPy.py -h`:
+**obselete**: ResynPy offers to the user two tasks of analysis: 1) Pairwise individual comparison of the genotyping data of a segragating population for detecting complementary pairs of individuals, and 2) Detection of homozygous regions (Runs Of Homozygosity; ROH) in the parental line of the segregating population and annotation of the corresponding markers based on their presence inside or outside of ROH.
+
+To see all the avaiable options for running the pipeline, type `python ResynPy.py -h`:
 
 ```
 usage: ResynPy.py [-h] [--vcf VCF FILE] [--results_dir STR] [--genos TAB FILE] [--markers TAB FILE] [--not_phased] [--scores_file FILE] [--filter_invariable FLOAT] [--hetero FLOAT]
@@ -173,6 +173,10 @@ During this process the genotypic profile of each individual is compared with th
    PR20CG15-1840-002|PR20CG15-1840-204	pair score: 19.75
    ```
 
+- `selected_pairs.png`
+
+   A figure showing the haplotypes of the individuals in the first selected pairs, in a color-coded manner.
+   
 - `PairComparison.log`
 
    Log file with the arguments used by the user and the different steps run by the pipeline. When the user runs again the pipeline the file is appended with the new information, so that the user can have a calendar of the different runs that can serve for evaluating the different parameters of the pipeline.
