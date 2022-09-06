@@ -180,7 +180,7 @@ def main():
 
     elif sys.platform == 'win32':
         print('\nYou are using a win32 operating system!\n\n')
-        print('\n\tPlease remember to order manually file "individual_genetic_distance.tab", in order to have the best pairs on the top of the list.\n')
+        print('\tPlease remember to order manually file "individual_genetic_distance.tab", in order to have the best pairs on the top of the list.\n')
 
 
 
