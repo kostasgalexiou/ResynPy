@@ -179,6 +179,7 @@ def main():
         logfile(results_folder, '\t' + command2 + '\n\n')
 
     elif sys.platform == 'win32':
+        print('\nYou are using a win32 operating system!\n\n')
         print('\n\tPlease order manually file "individual_genetic_distance.tab" based on the score column\n')
 
 
