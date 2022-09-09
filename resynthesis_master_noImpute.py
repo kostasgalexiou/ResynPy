@@ -34,7 +34,7 @@ def parse_arguments():
                         help='A 2-column tab-delimited file with the markers used for the F2 genotyping, in the format '
                              'of "chromosome<tab>marker name". Incombatible with "--vcf"')
 
-    parser.add_argument('--results_dir', metavar='STR', default='ROH_results',
+    parser.add_argument('--results_dir', metavar='STR', default='ResynPy_results',
                         help='Name of the results directory [Default: ResynPy_results]')
 
     parser.add_argument('--not_phased', action='store_true', help='Use this argument if your genotyping data are not '
