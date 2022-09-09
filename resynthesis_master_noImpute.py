@@ -287,6 +287,10 @@ def plot_pairs(param):
 
     os.system(cmd)
 
+    f2logfile(param, '------\n')
+    f2logfile(param, 'Step 2: Figure generation for the 10 pairs of individuals with the highest score\n')
+    f2logfile(param, '------\n\n')
+
     f2logfile(param, '\t' + cmd + '\n\n')
 
     end = datetime.datetime.now()
