@@ -111,9 +111,13 @@ During this process the genotypic profile of each individual is compared with th
 
 `--hetero`: a value defining the maximum level of heterozygosity for any indvidual in the pair. Low heterozygosity of an individual increases the probability to find a matching individual with a complementary genotype in the following generation.
 
+### Graphical representation of the 
+
+
+
 #### Output data
 
-All the output files are saved into the `--results_dir` directory 
+All the output files are saved into the `--results_dir` directory (Default results directory: *ResynPy_results*).
 
 - `selected_pairs.tab`
 
