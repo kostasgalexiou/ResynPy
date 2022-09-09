@@ -277,12 +277,6 @@ def f2data_analysis(param, arguments):
 
     # f3_prob(param)
 
-    end = datetime.datetime.now()
-
-    f2logfile(param, '--------\n')
-    f2logfile(param, 'End time: ' + str(end) + '\n')
-    f2logfile(param, '--------\n\n')
-
     return
 
 
@@ -295,6 +289,12 @@ def plot_pairs(param):
 
     f2logfile(param, '\t' + cmd + '\n\n')
 
+    end = datetime.datetime.now()
+
+    f2logfile(param, '--------\n')
+    f2logfile(param, 'End time: ' + str(end) + '\n')
+    f2logfile(param, '--------\n\n')
+    
     return
 
 
