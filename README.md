@@ -111,9 +111,6 @@ During this process the genotypic profile of each individual is compared with th
 
 `--hetero`: a value defining the maximum level of heterozygosity for any indvidual in the pair. Low heterozygosity of an individual increases the probability to find a matching individual with a complementary genotype in the following generation.
 
-### Graphical representation of the 
-
-
 
 #### Output data
 
@@ -177,9 +174,10 @@ All the output files are saved into the `--results_dir` directory (Default resul
    PR20CG15-1840-002|PR20CG15-1840-204	pair score: 19.75
    ```
 
-- `selected_pairs.png`
+- `<prefix>.png`, `<prefix>.pdf`
 
-   A figure showing the haplotypes of the individuals in the first 10 selected pairs, in a color-coded manner (Pending...).
+   A figure showing the haplotypes of the individuals in the first 10 selected pairs, in a color-coded manner. `<prefix>` corresponds to argument `--fig_prefix`, which by default is "*top10_selected_pairs*".
+   
    
 - `PairComparison.log`
 
