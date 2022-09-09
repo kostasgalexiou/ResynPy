@@ -165,6 +165,8 @@ All the output files are saved into the `--results_dir` directory (Default resul
 - `discarded_individuals_and_pairs.tab`
 
    File containing all individuals and/or pairs that have not met the filters set by the user, supplemented with the parameter that did not meet the criteria and its value.
+   
+   Example:
 
    ```
    PR20CG15-1840-3988	heterozygosity: 0.43
