@@ -49,7 +49,7 @@ optional arguments:
   --genos TAB FILE      Tab-delimited file (.tab) containing the genotyping data of the F2 population. Markers should be in columns and individuals in rows. Genotypes should be in the format "A,B,H,-", where
                         "-" represents missing data. Incomapatible with --vcf. This arguments is used together with --markers
   --markers TAB FILE    A 2-column tab-delimited file with the markers used for the F2 genotyping, in the format of "chromosome<tab>marker name". Incombatible with "--vcf"
-  --results_dir STR     Name of the results directory [Default: ROH_results]
+  --results_dir STR     Name of the results directory [Default: ResynPy_results]
   --not_phased          Use this argument if your genotyping data are not phased. [Default: FALSE]
   --scores_file FILE    A tab delimited file containing user-defined scores for the different combinations of genotypes, observed during the comparison of the individuals. Nucleotides ingenotypes should be
                         separated with a "/". e.g.: A/H<tab>0.75. [Default: scores_default.tab]
@@ -112,6 +112,8 @@ During this process the genotypic profile of each individual is compared with th
 `--hetero`: a value defining the maximum level of heterozygosity for any indvidual in the pair. Low heterozygosity of an individual increases the probability to find a matching individual with a complementary genotype in the following generation.
 
 #### Output data
+
+All the output files are saved into the `--results_dir` directory 
 
 - `selected_pairs.tab`
 
