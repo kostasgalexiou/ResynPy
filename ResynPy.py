@@ -15,12 +15,12 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from collections import OrderedDict as od
-from glob import glob
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="Detection of ROH regions and analysis of F2 genotyping data for detection of highly complementary "
-                    "individuals.")
+        description="Detection of ROHet regions and analysis of F2 genotyping data for detection of highly "
+                    "complementary individuals.")
 
     parser.add_argument('--genos', metavar='TAB FILE',
                         help='Tab-delimited file (.tab) containing the '
@@ -63,8 +63,9 @@ def parse_arguments():
                                                                                             '[Default: top10_selected'
                                                                                             '_pairs]')
 
-    parser.add_argument('--vcf', metavar='VCF FILE', help='Full path of the VCF file for the line, for which the ROH '
-                                                          'regions will be detected.')
+    parser.add_argument('--vcf', metavar='VCF FILE', help='Full path of the VCF file for the line, for which the ROHet '
+                                                          'regions will be detected (.vcf.gz compressed files are also '
+                                                          'accepted).')
 
     variables = vars(parser.parse_args())
 
