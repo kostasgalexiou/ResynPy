@@ -73,7 +73,7 @@ During this process the genotypic profile of each individual is compared with th
 - Example command:
 
    ```
-   python3 ResynPy.py --genos SD_F2data.tab --markers SDmarkers.tab --results_dir SD_results --filter_invariable 0.1 --hetero 0.4
+   python ResynPy.py --genos SD_F2data.tab --markers SDmarkers.tab [--results_dir ResynPy_results] [--filter_invariable 0.1] [--hetero 0.5] [--not_phased] [--scores_file scores_default.tab]
    ```
 
 #### Input data
@@ -200,7 +200,7 @@ In the case where a user has not yet decided on the set of markers that will use
 
 - Example command
 
-`python3 ResynPy.py --vcf SD.vcf.gz`
+`python ResynPy.py --vcf SD.vcf.gz [--results_dir ResynPy_results]`
 
 #### Input data
 
