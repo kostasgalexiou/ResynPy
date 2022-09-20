@@ -35,7 +35,7 @@ Apart from python, all the other packages are optional for the user to install. 
 
 ResynPy performs pairwise individual comparison of the genotyping data of a segragating population for detecting complementary pairs of individuals.
 
-**obselete**: ResynPy offers to the user two tasks of analysis: 1) Pairwise individual comparison of the genotyping data of a segragating population for detecting complementary pairs of individuals, and 2) Detection of homozygous regions (Runs Of Homozygosity; ROH) in the parental line of the segregating population and annotation of the corresponding markers based on their presence inside or outside of ROH.
+**obselete**: ResynPy offers to the user two tasks of analysis: 1) Pairwise individual comparison of the genotyping data of a segragating population for detecting complementary pairs of individuals, and 2) Detection of heterozygous regions (Runs Of Heterozygosity; ROHet), using [detectRUNS](https://cran.r-project.org/web/packages/detectRUNS/vignettes/detectRUNS.vignette.html), in the parental line of the segregating population and annotation of the corresponding markers based on their presence inside or outside of ROHet.
 
 To see all the avaiable options for running the pipeline, type `python ResynPy.py -h`:
 
