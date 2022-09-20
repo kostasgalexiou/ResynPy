@@ -15,7 +15,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from collections import OrderedDict as od
-
+from glob import glob
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -34,7 +34,7 @@ def parse_arguments():
                         help='A 2-column tab-delimited file with the markers used for the F2 genotyping, in the format '
                              'of "chromosome<tab>marker name". Incombatible with "--vcf"')
 
-    parser.add_argument('--results_dir', metavar='STR', default='ROH_results',
+    parser.add_argument('--results_dir', metavar='STR', default='ResynPy_results',
                         help='Name of the results directory [Default: ResynPy_results]')
 
     parser.add_argument('--not_phased', action='store_true', help='Use this argument if your genotyping data are not '
@@ -55,13 +55,24 @@ def parse_arguments():
                         help='Keep individuals that have a heterozygosity lower than the argument value. '
                              '[Default: 0.5]')
 
+    parser.add_argument('--fig_prefix', metavar='STR', default='top10_selected_pairs', help='Prefix to be used for the '
+                                                                                            '.png and .pdf figure, '
+                                                                                            'showing the genotype '
+                                                                                            'profiles of the 10 pairs '
+                                                                                            'with the highest score. '
+                                                                                            '[Default: top10_selected'
+                                                                                            '_pairs]')
+
+    parser.add_argument('--vcf', metavar='VCF FILE', help='Full path of the VCF file for the line, for which the ROH '
+                                                          'regions will be detected.')
+
     variables = vars(parser.parse_args())
 
     return parser.parse_args(), variables
 
 
 def logfile(param, string):
-    with open('%s/bcftools_roh-detection.log' % param.results_dir, 'a') as log:
+    with open('%s/roh-detection.log' % param.results_dir, 'a') as log:
         log.writelines(string)
     return
 
@@ -73,31 +84,78 @@ def f2logfile(param, string):
     return
 
 
-def roh_bcftools(param):
-    com1 = ' '.join(('bcftools roh --AF-dflt 0.4 -G 30 %s' % param.vcf, '>', '%s/ROH_G30' % param.results_dir))
-    logfile(param, '\t' + com1 + '\n')
+def rohet(param):
+
+    logfile(param, '\t#Script below generates a .map and .ped file (PLINK formats), starting from a VCF file. Output '
+                   'files are used for ROH detection\n')
+    com1 = 'python3 vcf2Plink-Ped-and-Mapfile.py %s %s' % (param.vcf, param.results_dir)
+    logfile(param, '\t' + com1 + '\n\n')
     os.system(com1)
 
-    com2 = ' '.join(('grep -v \'#\' %s/ROH_G30' % param.results_dir, '| awk \'$1=="ST"\'',
-                     '|', 'cut -f 3,4,5', '>', '%s/ROH_G30_sites' % param.results_dir))
+    vcfpath = op.dirname(param.vcf)
+    vcfname = op.basename(param.vcf)
+    if vcfname.endswith('.gz'):
+        vcfprefix = vcfname.split('.')[0]
+    else:
+        vcfprefix = op.splitext(vcfname)[0]
 
-    logfile(param, '\t' + com2 + '\n')
+    logfile(param, '\t#ROH detection with detectRUNS\n')
+    com2 = 'Rscript detect-runs.R {0}/{1}.ped {0}/{1}.map {0}/{1}'.format(param.results_dir, vcfprefix)
+
+    logfile(param, '\t' + com2 + '\n\n')
     os.system(com2)
 
-    with open('sdf', 'w') as out:
-        out.writelines('\t'.join(('chromosome', 'position', 'region\n')))
-        with open('%s/ROH_G30_sites' % param.results_dir) as f:
-            for line in f:
-                items = line.rstrip('\n\r').split('\t')
-                if items[-1] == '0':
-                    region = 'noROH'
+    os.replace(op.join(os.getcwd(), 'Runs_AllChromosome.pdf'), op.join(os.getcwd(), param.results_dir,
+                                                                       'Runs_AllChromosome.pdf'))
+    # os.remove(op.join(param.results_dir, vcfprefix+".map"))
+    # os.remove(op.join(param.results_dir, vcfprefix+".ped"))
+
+    with open(op.join(param.results_dir, 'SNP_annotation_with_runs.tab'), 'w') as out:
+        out.writelines('\t'.join(('chromosome', 'position', 'REF_allele', 'ALT_allele', 'region\n')))
+
+        with open(op.join(param.results_dir, vcfprefix+'.hetruns')) as runs:
+            runs = runs.readlines()[1:]
+
+            chroms2nos = od()
+            with open(op.join(vcfpath, 'chrom_to_numbers.tab')) as temp:
+                for z in temp:
+                    z = z.rstrip('\n\r').split('\t')
+                    chroms2nos[z[0]] = z[1]
+
+            chrom2hetruns = od()
+            for elem in runs:
+                elem = elem.rstrip('\n\r').split('\t')
+                chrom, from_, to_ = elem[2], elem[4], elem[5]
+
+                if chrom not in chrom2hetruns.keys():
+                    coords = list()
+
+                coords.append([int(from_), int(to_)])
+                chrom2hetruns[chrom] = coords
+
+        if param.vcf[-3:] == '.gz':
+            import gzip
+            vcfhandle = gzip.open(param.vcf, 'rt')
+        else:
+            vcfhandle = open(param.vcf)
+
+        for line in vcfhandle:
+            if line.startswith('#'):
+                continue
+
+            items = line.rstrip('\n\r').split('\t')
+            chromosome, position, ref, alt = items[0], items[1], items[3], items[4]
+
+            chrom_no = chroms2nos[chromosome]
+            for ro_range in chrom2hetruns[chrom_no]:
+                if int(position) in range(ro_range[0], ro_range[1] + 1):
+                    region = 'ROHet'
+                    break
                 else:
                     region = 'ROH'
-                out.writelines('\t'.join((items[0], items[1], region + '\n')))
+            out.writelines('\t'.join((chromosome, str(position), ref, alt, region + '\n')))
 
-    com3 = ' '.join(('mv', 'sdf', '%s/ROH_G30_sites' % param.results_dir))
-    os.system(com3)
-    logfile(param, '\t' + com3 + '\n\n')
+        vcfhandle.close()
 
     return
 
@@ -108,7 +166,7 @@ def generate_graph(param):
     logfile(param, '------\n\n')
     logfile(param, '\tfigure location: %s/ROH.png\n\n' % param.results_dir)
 
-    x = pd.read_csv('%s/ROH_G30_sites' % param.results_dir, header=0, sep='\t')
+    x = pd.read_csv('%s/SNP_annotation_with_runs.tab' % param.results_dir, header=0, sep='\t')
 
     x['position'] = x['position'].div(1000000, axis='index')
     plt.rc('font', size=6)
@@ -124,71 +182,65 @@ def generate_graph(param):
     return
 
 
-def snps_roh(param):
-    logfile(param, '------\n')
-    logfile(param, 'Step 3: Generate a file with ROH annotation.\n')
-    logfile(param, '------\n\n')
-
-    com = 'head -4 {0}/ROH_G30 | tail -1 | cut -f 3,4,5 > {0}/ROH_G30.header'.format(param.results_dir)
-    com1 = ' '.join(('grep -v \'#\' {0}/ROH_G30'.format(param.results_dir), '| awk \'$1=="RG"\'',
-                     '| awk \'{OFS="\\t"}{print $3, $4-1, $5}\'',
-                     '> {0}/ROH_G30.positions'.format(param.results_dir)))  # I substract 1 nt from the start in
-    # order to exclude the start coordinate of the ROH_G30 file.
-    com1a = 'cat {0}/ROH_G30.header {0}/ROH_G30.positions > x'.format(param.results_dir)
-    com1b = 'mv x {0}/ROH_G30.positions'.format(param.results_dir)
-
-    if param.vcf[-3:] == '.gz':
-        com2 = 'vcftools --gzvcf {0} --exclude-bed {1}/ROH_G30.positions --recode ' \
-               '--out {1}/noROH_G30'.format(param.vcf, param.results_dir)
-        com2a = 'vcftools --gzvcf {0} --bed {1}/ROH_G30.positions --recode ' \
-                '--out {1}/ROH_G30'.format(param.vcf, param.results_dir)
-    else:
-        com2 = 'vcftools --vcf {0} --exclude-bed {1}/ROH_G30.positions --recode ' \
-               '--out {1}/noROH_G30'.format(param.vcf, param.results_dir)
-        com2a = 'vcftools --vcf {0} --bed {1}/ROH_G30.positions --recode ' \
-                '--out {1}/ROH_G30'.format(param.vcf, param.results_dir)
-
-    com3 = ' '.join(('grep -v \'#\' {0}/ROH_G30.recode.vcf'.format(param.results_dir),
-                     '| awk \'{OFS="\\t"}{print $1, $2, $4, $5, "ROH"}\'',
-                     '> {0}/markers_ROH-anno.tab'.format(param.results_dir)))
-    com3a = ' '.join(('grep -v \'#\' {0}/noROH_G30.recode.vcf'.format(param.results_dir),
-                      '| awk \'{OFS="\\t"}{print $1, $2, $4, $5, "noROH"}\'',
-                      '> {0}/markers_noROH-anno.tab'.format(param.results_dir)))
-    com4 = 'echo "chrom\tpos\tref\talt\tregion" > {0}/markers_region-anno.tab'.format(param.results_dir)
-    com4a = 'cat {0}/markers_ROH-anno.tab {0}/markers_noROH-anno.tab | sort -k1,1 -k2,2n | uniq >> ' \
-            '{0}/markers_region-anno.tab'.format(param.results_dir)
-
-    logfile(param, '\t' + com + '\n')
-    logfile(param, '\t' + com1 + '\n')
-    logfile(param, '\t' + com1a + '\n')
-    logfile(param, '\t' + com1b + '\n')
-    logfile(param, '\t' + com2 + '\n')
-    logfile(param, '\t' + com2a + '\n')
-    logfile(param, '\t' + com3 + '\n')
-    logfile(param, '\t' + com3a + '\n')
-    logfile(param, '\t' + com4 + '\n')
-    logfile(param, '\t' + com4a + '\n')
-
-    for command in [com, com1, com1a, com1b, com2, com2a, com3, com3a, com4, com4a]:
-        os.system(command)
-
-    return
+# def snps_roh(param):
+#     logfile(param, '------\n')
+#     logfile(param, 'Step 3: Generate a file with ROH annotation.\n')
+#     logfile(param, '------\n\n')
+#
+#     com = 'head -4 {0}/ROH_G30 | tail -1 | cut -f 3,4,5 > {0}/ROH_G30.header'.format(param.results_dir)
+#     com1 = ' '.join(('grep -v \'#\' {0}/ROH_G30'.format(param.results_dir), '| awk \'$1=="RG"\'',
+#                      '| awk \'{OFS="\\t"}{print $3, $4-1, $5}\'',
+#                      '> {0}/ROH_G30.positions'.format(param.results_dir)))  # I substract 1 nt from the start in
+#     # order to exclude the start coordinate of the ROH_G30 file.
+#     com1a = 'cat {0}/ROH_G30.header {0}/ROH_G30.positions > x'.format(param.results_dir)
+#     com1b = 'mv x {0}/ROH_G30.positions'.format(param.results_dir)
+#
+#     if param.vcf[-3:] == '.gz':
+#         com2 = 'vcftools --gzvcf {0} --exclude-bed {1}/ROH_G30.positions --recode ' \
+#                '--out {1}/noROH_G30'.format(param.vcf, param.results_dir)
+#         com2a = 'vcftools --gzvcf {0} --bed {1}/ROH_G30.positions --recode ' \
+#                 '--out {1}/ROH_G30'.format(param.vcf, param.results_dir)
+#     else:
+#         com2 = 'vcftools --vcf {0} --exclude-bed {1}/ROH_G30.positions --recode ' \
+#                '--out {1}/noROH_G30'.format(param.vcf, param.results_dir)
+#         com2a = 'vcftools --vcf {0} --bed {1}/ROH_G30.positions --recode ' \
+#                 '--out {1}/ROH_G30'.format(param.vcf, param.results_dir)
+#
+#     com3 = ' '.join(('grep -v \'#\' {0}/ROH_G30.recode.vcf'.format(param.results_dir),
+#                      '| awk \'{OFS="\\t"}{print $1, $2, $4, $5, "ROH"}\'',
+#                      '> {0}/markers_ROH-anno.tab'.format(param.results_dir)))
+#     com3a = ' '.join(('grep -v \'#\' {0}/noROH_G30.recode.vcf'.format(param.results_dir),
+#                       '| awk \'{OFS="\\t"}{print $1, $2, $4, $5, "noROH"}\'',
+#                       '> {0}/markers_noROH-anno.tab'.format(param.results_dir)))
+#     com4 = 'echo "chrom\tpos\tref\talt\tregion" > {0}/markers_region-anno.tab'.format(param.results_dir)
+#     com4a = 'cat {0}/markers_ROH-anno.tab {0}/markers_noROH-anno.tab | sort -k1,1 -k2,2n | uniq >> ' \
+#             '{0}/markers_region-anno.tab'.format(param.results_dir)
+#
+#     logfile(param, '\t' + com + '\n')
+#     logfile(param, '\t' + com1 + '\n')
+#     logfile(param, '\t' + com1a + '\n')
+#     logfile(param, '\t' + com1b + '\n')
+#     logfile(param, '\t' + com2 + '\n')
+#     logfile(param, '\t' + com2a + '\n')
+#     logfile(param, '\t' + com3 + '\n')
+#     logfile(param, '\t' + com3a + '\n')
+#     logfile(param, '\t' + com4 + '\n')
+#     logfile(param, '\t' + com4a + '\n')
+#
+#     for command in [com, com1, com1a, com1b, com2, com2a, com3, com3a, com4, com4a]:
+#         os.system(command)
+#
+#     return
 
 
 def roh_detection(param, arguments):
     now = datetime.datetime.now()
 
-    logfile(param, '===============================================================================================\n')
-    logfile(param, 'ROH detection using BCFTOOLS, graph generation and selection of variants inside non-ROH regions\n')
-    logfile(param,
-            '===============================================================================================\n\n')
+    logfile(param, '=======================================================================\n')
+    logfile(param, 'ROH detection using detectRUNs, graph generation and variant annotation\n')
+    logfile(param, '=======================================================================\n\n')
 
-    logfile(param, '---------\n')
-    logfile(param, 'variables:\n')
-    logfile(param, '---------\n\n')
-
-    for k, v in arguments.items():
-        logfile(param, '\t' + k + ': ' + str(v) + '\n')
+    roh_write_variables(param, arguments)
 
     logfile(param, '\n----------\n')
     logfile(param, 'Start time: ' + str(now) + '\n')
@@ -198,18 +250,12 @@ def roh_detection(param, arguments):
     logfile(param, 'Step 1: ROH detection\n')
     logfile(param, '------\n\n')
 
-    roh_bcftools(param)
+    rohet(param)
 
+    print('generating graph...')
     generate_graph(param)
 
-    snps_roh(param)
-
-    com = 'rm {0}/markers_ROH-anno.tab {0}/markers_noROH-anno.tab  {0}/ROH_G30.header ' \
-          '{0}/ROH_G30_sites {0}/noROH_G30.recode.vcf {0}/noROH_G30.log {0}/ROH_G30.positions ' \
-          '{0}/ROH_G30.recode.vcf {0}/ROH_G30.log'.format(param.results_dir)
-
-    logfile(param, '\t' + com + '\n\n')
-    os.system(com)
+    # snps_roh(param)
 
     end = datetime.datetime.now()
     logfile(param, '--------\n')
@@ -266,6 +312,22 @@ def f2data_analysis(param, arguments):
 
     # f3_prob(param)
 
+    return
+
+
+def plot_pairs(param):
+
+    cmd = ' '.join(('python3 plot_pair_genotypes.py', '/'.join((param.results_dir, 'individual_genetic_distance.tab')),
+                    param.genos, param.markers, param.results_dir+'/'+param.fig_prefix))
+
+    os.system(cmd)
+
+    f2logfile(param, '------\n')
+    f2logfile(param, 'Step 2: Figure generation for the 10 pairs of individuals with the highest score\n')
+    f2logfile(param, '------\n\n')
+
+    f2logfile(param, '\t' + cmd + '\n\n')
+
     end = datetime.datetime.now()
 
     f2logfile(param, '--------\n')
@@ -273,6 +335,21 @@ def f2data_analysis(param, arguments):
     f2logfile(param, '--------\n\n')
 
     return
+
+
+def roh_write_variables(param, args):
+    logfile(param, '---------\n')
+    logfile(param, 'variables:\n')
+    logfile(param, '---------\n\n')
+
+    for k, v in args.items():
+        to_none = ['scores_file', 'filter_invariable', 'hetero', 'fig_prefix']
+        if k in to_none:
+            v = 'None'
+        else:
+            v = v
+
+        logfile(param, '\t' + k + ': ' + str(v) + '\n')
 
 
 def main():
@@ -298,6 +375,7 @@ def main():
             sys.exit('\nExiting process...\nArguments --markers and --genos should be used together\n')
 
         f2data_analysis(arguments, variable)
+        plot_pairs(arguments)
 
 
 if __name__ == '__main__':
