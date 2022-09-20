@@ -57,23 +57,23 @@ optional arguments:
                         Keep individual pairs that have a percentage of AA or BB combinations that is lower than the argument value. [Default: 0.1]
   --hetero FLOAT        Keep individuals that have a heterozygosity lower than the argument value. [Default: 0.5]
   --fig_prefix STR      Prefix to be used for the .png and .pdf figure, showing the genotype profiles of the 10 pairs with the highest score. [Default: top10_selected_pairs]
-  --vcf VCF FILE        Full path of the VCF file for the line, for which the ROH regions will be detected.
+  --vcf VCF FILE        Full path of the VCF file for the line, for which the ROH regions will be detected (.vcf.gz compressed files are also accepted).
 
 ```
+- Example data provided in the repository:
+
+   - `SDmarkers.tab`: markers file
+   - `SD_F2data.tab`: genotyping file
+   - `SD.vcf.gz`: VCF file with SNP data of the elite line
 
 ### Pairwise comparison
 
 During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the segregating population. Each pair of genotypes in a specific marker has a score assigned to it. Scores for each combination of genotypes is provided in the file `scores_default.tab`. The user can also provide a tab-delimited file with different scores (see below). Every time a comparison is made, the pipeline outputs the sum of the genotype-specific scores for the pair of individuals analyzed and the process is completed when all the possible one-way pairwise comparisons are made. For this type of analysis the user must provide a file with the genotyping data (`--genos`) and a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
 
-- Example data provided in the repository:
-
-   - SDmarkers.tab: markers file
-   - SD_F2data.tab: genotyping file
-
-- Example of command:
+- Example command:
 
    ```
-   python ResynPy.py --genos SD_F2data.tab --markers SDmarkers.tab --results_dir SD_results --filter_invariable 0.1 --hetero 0.4
+   python3 ResynPy.py --genos SD_F2data.tab --markers SDmarkers.tab --results_dir SD_results --filter_invariable 0.1 --hetero 0.4
    ```
 
 #### Input data
@@ -194,9 +194,13 @@ All the output files are saved into the `--results_dir` directory (Default resul
 
 
 ## THE TEXT BELOW WILL MOST PROBABLY BE DISCARDED
-### ROH detection
+### ROHet detection
 
-In the case where a user has not yet decided on the set of markers that will be used for screening the segregating population, ResynPy pipeline is providing an additional functionality that is to detect regions of homozygosity (Runs Of Homozygosity; ROH) from a VCF file resulted from the analysis of resequencing data from the elite cultivar line. The output of this process is a tab-delimited file containing the annotation of each marker based on its presence inside a ROH region or not.
+In the case where a user has not yet decided on the set of markers that will use for screening the segregating population, ResynPy pipeline is providing an additional functionality for detecting regions of heterozygosity (Runs Of Heterozygosity; ROHet) from a VCF file resulted from the analysis of resequencing data of the elite cultivar. The output of this process is a tab-delimited file containing the annotation of each marker based on its presence inside a ROHet region or not.
+
+- Example command
+
+`python3 ResynPy.py --vcf SD.vcf.gz`
 
 #### Input data
 
@@ -205,6 +209,17 @@ In the case where a user has not yet decided on the set of markers that will be 
 --vcf: VCF file containing SNPs of the elite line for which a segregating population will be generated.
 
 #### Output data
+
+chrom_to_numbers.tab
+roh-detection.log
+ROH.png
+Runs_AllChromosome.pdf
+SNP_annotation_with_runs.tab
+Sweetdream_snps.hetruns
+Sweetdream_snps.map
+Sweetdream_snps.ped
+Sweetdream_snps.summary_ROH_mean_chr
+
 
 - `markers_region-anno.tab`
 
