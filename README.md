@@ -37,25 +37,27 @@ ResynPy performs pairwise individual comparison of the genotyping data of a segr
 
 **obselete**: ResynPy offers to the user two tasks of analysis: 1) Pairwise individual comparison of the genotyping data of a segragating population for detecting complementary pairs of individuals, and 2) Detection of heterozygous regions (Runs Of Heterozygosity; ROHet), using [detectRUNS](https://cran.r-project.org/web/packages/detectRUNS/vignettes/detectRUNS.vignette.html), in the parental line of the segregating population and annotation of the corresponding markers based on their presence inside or outside of ROHet.
 
-To see all the avaiable options for running the pipeline, type `python ResynPy.py -h`:
+To see all the avaiable options for running the pipeline, type `python (or python3) ResynPy.py -h`:
 
 ```
-usage: ResynPy.py [-h] [--vcf VCF FILE] [--results_dir STR] [--genos TAB FILE] [--markers TAB FILE] [--not_phased] [--scores_file FILE] [--filter_invariable FLOAT] [--hetero FLOAT]
+usage: ResynPy.py [-h] [--genos TAB FILE] [--markers TAB FILE] [--results_dir STR] [--not_phased] [--scores_file FILE] [--filter_invariable FLOAT] [--hetero FLOAT] [--fig_prefix STR] [--vcf VCF FILE]
 
-Detection of ROH regions and analysis of F2 genotyping data for detection of highly complementary individuals.
+Detection of ROHet regions and analysis of F2 genotyping data for detection of highly complementary individuals.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --genos TAB FILE      Tab-delimited file (.tab) containing the genotyping data of the F2 population. Markers should be in columns and individuals in rows. Genotypes should be in the format "A,B,H,-", where
-                        "-" represents missing data. Incomapatible with --vcf. This arguments is used together with --markers
+  --genos TAB FILE      Tab-delimited file (.tab) containing the genotyping data of the F2 population. Markers should be in columns and individuals in rows. Genotypes should be in the format "A,B,H,-", where "-" represents missing
+                        data. Incomapatible with --vcf. This argument has to be used together with --markers
   --markers TAB FILE    A 2-column tab-delimited file with the markers used for the F2 genotyping, in the format of "chromosome<tab>marker name". Incombatible with "--vcf"
   --results_dir STR     Name of the results directory [Default: ResynPy_results]
   --not_phased          Use this argument if your genotyping data are not phased. [Default: FALSE]
-  --scores_file FILE    A tab delimited file containing user-defined scores for the different combinations of genotypes, observed during the comparison of the individuals. Nucleotides ingenotypes should be
-                        separated with a "/". e.g.: A/H<tab>0.75. [Default: scores_default.tab]
+  --scores_file FILE    A tab delimited file containing user-defined scores for the different combinations of genotypes, observed during the comparison of the individuals. Nucleotides ingenotypes should be separated with a "/".
+                        e.g.: A/H<tab>0.75. [Default: scores_default.tab]
   --filter_invariable FLOAT
                         Keep individual pairs that have a percentage of AA or BB combinations that is lower than the argument value. [Default: 0.1]
   --hetero FLOAT        Keep individuals that have a heterozygosity lower than the argument value. [Default: 0.5]
+  --fig_prefix STR      Prefix to be used for the .png and .pdf figure, showing the genotype profiles of the 10 pairs with the highest score. [Default: top10_selected_pairs]
+  --vcf VCF FILE        Full path of the VCF file for the line, for which the ROH regions will be detected.
 
 ```
 
@@ -63,10 +65,15 @@ optional arguments:
 
 During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the segregating population. Each pair of genotypes in a specific marker has a score assigned to it. Scores for each combination of genotypes is provided in the file `scores_default.tab`. The user can also provide a tab-delimited file with different scores (see below). Every time a comparison is made, the pipeline outputs the sum of the genotype-specific scores for the pair of individuals analyzed and the process is completed when all the possible one-way pairwise comparisons are made. For this type of analysis the user must provide a file with the genotyping data (`--genos`) and a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
 
+- Example data provided in the repository:
+
+   - SDmarkers.tab: markers file
+   - SD_F2data.tab: genotyping file
+
 - Example of command:
 
    ```
-   python resynthesis_master_noImpute.py --genos SD_F2data.tab --markers SDmarkers.tab --results_dir SD_results --filter_invariable 0.1 --hetero 0.4
+   python ResynPy.py --genos SD_F2data.tab --markers SDmarkers.tab --results_dir SD_results --filter_invariable 0.1 --hetero 0.4
    ```
 
 #### Input data
