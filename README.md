@@ -40,35 +40,31 @@ ResynPy performs pairwise individual comparison of the genotyping data of a segr
 To see all the avaiable options for running the pipeline, type `python (or python3) ResynPy.py -h`:
 
 ```
-usage: ResynPy.py [-h] [--genos TAB FILE] [--markers TAB FILE] [--results_dir STR] [--not_phased] [--scores_file FILE] [--filter_invariable FLOAT] [--hetero FLOAT] [--fig_prefix STR] [--vcf VCF FILE]
+usage: resynthesis_master.py [-h] [--genos TAB FILE] [--markers TAB FILE] [--results_dir STR] [--not_phased] [--scores_file FILE] [--invariable FLOAT] [--hetero FLOAT] [--out_prefix STR]
 
-Detection of ROHet regions and analysis of F2 genotyping data for detection of highly complementary individuals.
+Analysis of F2 genotyping data for detection of highly complementary individuals.
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --genos TAB FILE      Tab-delimited file (.tab) containing the genotyping data of the F2 population. Markers should be in columns and individuals in rows. Genotypes should be in the format "A,B,H,-", where "-" represents missing
-                        data. Incomapatible with --vcf. This argument has to be used together with --markers
-  --markers TAB FILE    A 2-column tab-delimited file with the markers used for the F2 genotyping, in the format of "chromosome<tab>marker name". Incombatible with "--vcf"
-  --results_dir STR     Name of the results directory [Default: ResynPy_results]
-  --not_phased          Use this argument if your genotyping data are not phased. [Default: FALSE]
-  --scores_file FILE    A tab delimited file containing user-defined scores for the different combinations of genotypes, observed during the comparison of the individuals. Nucleotides ingenotypes should be separated with a "/".
-                        e.g.: A/H<tab>0.75. [Default: scores_default.tab]
-  --filter_invariable FLOAT
-                        Keep individual pairs that have a percentage of AA or BB combinations that is lower than the argument value. [Default: 0.1]
-  --hetero FLOAT        Keep individuals that have a heterozygosity lower than the argument value. [Default: 0.5]
-  --fig_prefix STR      Prefix to be used for the .png and .pdf figure, showing the genotype profiles of the 10 pairs with the highest score. [Default: top10_selected_pairs]
-  --vcf VCF FILE        Full path of the VCF file for the line, for which the ROH regions will be detected (.vcf.gz compressed files are also accepted).
-
+  -h, --help          show this help message and exit
+  --genos TAB FILE    Tab-delimited file (.tab) containing the genotyping data of the F2 population. Markers should be in columns and individuals in rows. Genotypes should be in the format "A,B,H,-", where "-" represents missing
+                      data. This argument has to be used together with --markers
+  --markers TAB FILE  A 2-column tab-delimited file with the markers used for the F2 genotyping, in the format of "chromosome<tab>marker name". Marker order per chromosome should match that of markers in the genotyping file.
+  --results_dir STR   Name of the results directory [Default: ResynPy_results]
+  --not_phased        Use this argument if your genotyping data are not phased. [Default: FALSE]
+  --scores_file FILE  A tab delimited file containing user-defined scores for the different combinations of genotypes, assigned during the comparison of the individuals. Nucleotides ingenotypes should be separated with a "/".
+                      e.g.: A/H<tab>0.75. [Default: scores_default.tab]
+  --invariable FLOAT  Keep individual pairs that have a percentage of AA or BB combinations that is lower than the argument's value. [Default: 0.1]
+  --hetero FLOAT      Keep individuals that have a heterozygosity lower than the argument's value. [Default: 0.5]
+  --out_prefix STR    Prefix for the output files.[Default: resynpyOut]
 ```
 - Example data provided in the repository:
 
    - `SDmarkers.tab`: markers file
-   - `SD_F2data.tab`: genotyping file
-   - `SD.vcf.gz`: VCF file with SNP data of the elite line
+   - `SD_F2data.tab`: genotyping file originating from [Eduardo et al., 2020](https://www.frontiersin.org/articles/10.3389/fpls.2020.01205/full)
 
 ### Pairwise comparison
 
-During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the segregating population. Each pair of genotypes in a specific marker has a score assigned to it. Scores for each combination of genotypes is provided in the file `scores_default.tab`. The user can also provide a tab-delimited file with different scores (see below). Every time a comparison is made, the pipeline outputs the sum of the genotype-specific scores for the pair of individuals analyzed and the process is completed when all the possible one-way pairwise comparisons are made. For this type of analysis the user must provide a file with the genotyping data (`--genos`) and a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
+During this process the genotypic profile of each individual is compared with the corresponding profile of the rest of the individuals in the F2 population. Each pair of genotypes in a specific marker has a score assigned to it. All scores assigned at each genotype pair are summed up and the total score is tagged to the respective pair of individuals. Scores for each combination of genotypes is provided in the file `scores_default.tab`. The user can also provide a tab-delimited file with different scores (see below). For the pairwise comparison analysis, the user should provide a file with the genotyping data (`--genos`) and a file with markers information (`--markers`) (see below). The pipeline considers that genotyping data are phased. If data are not phased then the user should declare it by using the argument `--not_phased`.
 
 - Example command:
 
@@ -80,7 +76,7 @@ During this process the genotypic profile of each individual is compared with th
 
 ##### Mandatory arguments
 
-`--genos`: a tab-delimited file with individuals in rows and markers in columns. Individual column should have a title. Data should be in A, B, H format; i.e. "A" represents the homogyzous genotype for one allele, "B" the homozygous genotype for the other allele and "H" the heterozygous genotype. Missing data should be represented as "-".
+`--genos`: A tab-delimited file with individuals in rows and markers in columns. Markers should ordered first by chromosome and then by their physical or genetic position. Individual column should have a title. Data should be in A, B, H format; i.e. "A" represents the homogyzous genotype for one allele, "B" the homozygous genotype for the other allele and "H" the heterozygous genotype. Missing data should be represented as "-".
 
    - example of genotyping data.
 
@@ -93,13 +89,13 @@ During this process the genotypic profile of each individual is compared with th
          indv_n	A	-	H	-	H	H	A	H	A	A	...
 
 
-`--markers`: a 2-column tab-delimited file. Column 1: marker name used for genotyping the population. Column 2: chromosome the marker belongs to. File should be sorted by chromosome.
+`--markers`: A 2-column tab-delimited file. Column 1: marker name used for genotyping the population. Column 2: chromosome the marker belongs to. Marker order should match that of the genotyping file.
 
 ##### Optional arguments
 
-`--not_phased`: this argument should be used if genotyping data are not phased. The use of this argument will cause the exclusion of recombination information in the output file (see _Output data_ Section).
+`--not_phased`: Should be used if genotyping data are not phased. The use of this argument will cause the exclusion of recombination information form the output file (see _Output data_ Section).
 
-`--scores_file`: A 2-column tab-delimited file containing scores assigned to each possible genotype combination, when two individuals are compared. Column 1: genotype pair, Column 2: score. By default, the pipeline will use the score information present inside file `scores_default.tab`, provided in the repository's main directory. However if the user wants to apply different scoring, a tab-delimited file should be provided by using this argument. 
+`--scores_file`: A 2-column tab-delimited file containing scores assigned to each possible genotype combination, when two individuals are compared. Column 1: genotype pair, Column 2: score. By default, the pipeline will use the score information present inside file `scores_default.tab`, provided in the repository's main directory. However if the user wants to apply a different scoring, a tab-delimited file can be provided by using this argument. 
 
    - contents of `scores_default.tab`:
 
@@ -114,9 +110,9 @@ During this process the genotypic profile of each individual is compared with th
          B/H	0.75
          A/B	1
 
-`--filter_invariable`: we also offer the possibility to filter out pairs of individuals that have a number of genotype identities (A/A or B/B) higher than the threshold float value set by this argument. The use of this argument can speed up the whole comparison process, since the pipeline does not proceed to score assignment if the pair is to be discarded. In theory, there shouldn't be any genotype identity between the two individuals, since the presence of genotype identity implies that the corresponding region of the genome will not contribute to obtaining the near-identical variety when the two individuals are crossed. Therefore, the value of this argument should be as low as possible.
+`--invariable`: We also offer the possibility to filter out pairs of individuals that have a number of genotype identities (A/A or B/B) higher than the threshold float value set by this argument. The use of this argument can speed up the whole comparison process, since the pipeline does not proceed to score assignment if the pair is discarded. In theory, there shouldn't be any genotype identity between the two individuals, since the presence of genotype identity implies that the corresponding region of the genome will not contribute to obtaining the near-identical variety when the two individuals are crossed. Therefore, the value of this argument should be as low as possible.
 
-`--hetero`: a value defining the maximum level of heterozygosity for any indvidual in the pair. Low heterozygosity of an individual increases the probability to find a matching individual with a complementary genotype in the following generation.
+`--hetero`: A value defining the maximum level of heterozygosity for any indvidual in the pair. Low heterozygosity of an individual increases the probability to find a matching individual with a complementary genotype in the following generation.
 
 
 #### Output data
@@ -134,14 +130,14 @@ All the output files are saved into the `--results_dir` directory (Default resul
    column 3: number of AA genotype pairs
 
    column 4: number of BB genotype pairs
+   
+   _#### The following three columns are included in the output if data are phased._
 
    column 5: number of recombinations present in the first individual
 
    column 6: number of recombinations present in the second individual
 
    column 7: total number of recombinations in the pair
-
-   _#### The last three columns are included in the output if data are phased._
 
    Example of output file for _unphased_ data:
 
