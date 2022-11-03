@@ -110,9 +110,11 @@ During this process the genotypic profile of each individual is compared with th
          B/H	0.75
          A/B	1
 
-`--invariable`: We also offer the possibility to filter out pairs of individuals that have a number of genotype identities (A/A or B/B) higher than the threshold float value set by this argument. The use of this argument can speed up the whole comparison process, since the pipeline does not proceed to score assignment if the pair is discarded. In theory, there shouldn't be any genotype identity between the two individuals, since the presence of genotype identity implies that the corresponding region of the genome will not contribute to obtaining the near-identical variety when the two individuals are crossed. Therefore, the value of this argument should be as low as possible.
+`--invariable`: We also offer the possibility to filter out pairs of individuals that have a number of genotype identities (A/A or B/B) higher than the threshold float value set by this argument. The use of this argument can speed up the whole comparison process, since the pipeline does not proceed to score assignment if the pair is discarded. In theory, there shouldn't be any genotype identity between the two individuals, since the presence of genotype identity implies that the corresponding region of the genome will not contribute to obtaining the near-identical variety when the two individuals are crossed. Therefore, the value of this argument should be as low as possible. Default value: _0.01_
 
-`--hetero`: A value defining the maximum level of heterozygosity for any indvidual in the pair. Low heterozygosity of an individual increases the probability to find a matching individual with a complementary genotype in the following generation.
+`--hetero`: A value defining the maximum level of heterozygosity for any indvidual in the pair. Low heterozygosity of an individual increases the probability to find a matching individual with a complementary genotype in the following generation. Default value: _0.5_
+
+`--out_prefix`: Prefix to be used for all the output files. Default value: _resynpyOut_
 
 
 #### Output data
@@ -127,9 +129,9 @@ All the output files are saved into the `--results_dir` directory (Default resul
 
    column 2: total score of genotyping
 
-   column 3: number of AA genotype pairs
+   column 3: total number of invariable pairs (AA or BB)
 
-   column 4: number of BB genotype pairs
+   column 4: average pair heterozygosity
    
    _#### The following three columns are included in the output if data are phased._
 
@@ -142,27 +144,23 @@ All the output files are saved into the `--results_dir` directory (Default resul
    Example of output file for _unphased_ data:
 
    ```
-   #indiv_pair	score	AA pairs	BB pairs
-   PR20CG15-1840-1675|PR20CG15-1840-3523	22.5	0	0
-   PR20CG15-1840-059|PR20CG15-1840-1911	22.25	0	0
-   PR20CG15-1840-2382|PR20CG15-1840-3853	22.25	0	0
-   PR20CG15-1840-1717|PR20CG15-1840-3848	22.0	0	0
-   PR20CG15-1840-1872|PR20CG15-1840-3288	22.0	0	0
-   PR20CG15-1840-1872|PR20CG15-1840-3433	22.0	0	0
-   PR20CG15-1840-1455|PR20CG15-1840-3588	21.875	0	0
+   #indiv_pair	score	invariable_pairs	average_heterozygosity
+   SDF2-131|SDF2-180	52.875	0	0.29
+   SDF2-180|SDF2-190	51.375	0	0.31
+   SDF2-131|SDF2-146	50.625	2	0.23
+   SDF2-156|SDF2-222	50.375	0	0.35
+   SDF2-188|SDF2-300	50.375	0	0.36
    ```
 
    Example of output file for _phased_ data:
 
    ```
-   #indiv_pair	score	AA pairs	BB pairs	recomb_no1	recomb_no2	sum_recomb
-   PR20CG15-1840-1675|PR20CG15-1840-3523	22.5	0	0	0	0	0
-   PR20CG15-1840-059|PR20CG15-1840-1911	22.25	0	0	0	0	0
-   PR20CG15-1840-2382|PR20CG15-1840-3853	22.25	0	0	0	0	0
-   PR20CG15-1840-1717|PR20CG15-1840-3848	22.0	0	0	0	0	0
-   PR20CG15-1840-1872|PR20CG15-1840-3288	22.0	0	0	0	0	0
-   PR20CG15-1840-1872|PR20CG15-1840-3433	22.0	0	0	0	0	0
-   PR20CG15-1840-1455|PR20CG15-1840-3588	21.875	0	0	0	0	0
+   #indiv_pair	score	invariable_pairs	average_heterozygosity	recomb_no1	recomb_no2	sum_recomb
+   SDF2-131|SDF2-180	52.875	0	0.29	1	0	1
+   SDF2-180|SDF2-190	51.375	0	0.31	0	0	0
+   SDF2-131|SDF2-146	50.625	2	0.23	1	5	6
+   SDF2-156|SDF2-222	50.375	0	0.35	0	0	0
+   SDF2-188|SDF2-300	50.375	0	0.36	0	0	0
    ```
 
 - `discarded_individuals_and_pairs.tab`
@@ -181,8 +179,7 @@ All the output files are saved into the `--results_dir` directory (Default resul
 
 - `<prefix>.png`, `<prefix>.pdf`
 
-   A figure showing the haplotypes of the individuals in the first 10 selected pairs, in a color-coded manner. `<prefix>` corresponds to argument `--fig_prefix`, which by default is "*top10_selected_pairs*".
-   
+   A figure showing the haplotypes of the individuals in the first 10 selected pairs, in a color-coded mode. `<prefix>` corresponds to argument `--out_prefix`.
    
 - `PairComparison.log`
 
