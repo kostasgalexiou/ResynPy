@@ -67,7 +67,7 @@ During this process the genotypic profile of each individual is compared with th
 - Example command:
 
    ```
-   python ResynPy.py --genos SD_F2data.tab --markers SDmarkers.tab [--results_dir ResynPy_results] [--filter_invariable 0.1] [--hetero 0.5] [--not_phased] [--scores_file scores_default.tab]
+   python ResynPy.py --genos SD_F2data.tab --markers SDmarkers.tab [--results_dir ResynPy_results] [--filter_invariable 0.01] [--hetero 0.5] [--not_phased] [--scores_file scores_default.tab]
    ```
 
 #### Input data
