@@ -133,7 +133,7 @@ All the output files are saved into the `--results_dir` directory (Default resul
 
    column 4: average pair heterozygosity
    
-   _#### The following three columns are included in the output if data are phased._
+   _#### If data are phased, the following three columns are included in the output:_
 
    column 5: number of recombinations present in the first individual
 
