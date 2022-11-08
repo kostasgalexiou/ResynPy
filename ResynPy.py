@@ -47,9 +47,9 @@ def parse_arguments():
                              'genotypes should be separated with a "/". '
                              'e.g.: A/H<tab>0.75. [Default: scores_default.tab]')
 
-    parser.add_argument('--invariable', metavar='FLOAT', default=0.1,
+    parser.add_argument('--invariable', metavar='FLOAT', default=0.01,
                         help='Keep individual pairs that have a percentage of AA or '
-                             "BB combinations that is lower than the argument's value. [Default: 0.1]")
+                             "BB combinations that is lower than the argument's value. [Default: 0.01]")
 
     parser.add_argument('--hetero', metavar='FLOAT', default=0.5,
                         help="Keep individuals that have a heterozygosity lower than the argument's value. "
