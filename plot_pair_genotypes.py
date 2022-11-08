@@ -7,7 +7,7 @@
 """
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
+from matplotlib.patches import Rectangle, Patch
 import sys
 from collections import OrderedDict as od
 from collections import Counter
@@ -64,11 +64,11 @@ def get_indv_colors(ind_genos, white_pos):
             if geno == 'A':
                 ind_colors.append('salmon')
             elif geno == 'B':
-                ind_colors.append('palegreen')
+                ind_colors.append('lightblue')
             elif geno == 'H':
                 ind_colors.append('yellow')
             elif geno == '-':
-                ind_colors.append('lightgrey')
+                ind_colors.append('lightgray')
 
             ind_colors.append('white')
 
@@ -76,11 +76,11 @@ def get_indv_colors(ind_genos, white_pos):
             if geno == 'A':
                 color = 'salmon'
             elif geno == 'B':
-                color = 'palegreen'
+                color = 'lightblue'
             elif geno == 'H':
                 color = 'yellow'
             elif geno == '-':
-                color = 'lightgrey'
+                color = 'lightgray'
             ind_colors.append(color)
 
     return ind_colors
@@ -106,7 +106,8 @@ def generate_graph(indv_dict):
 
             ind1_colors = get_indv_colors(ind1_genos, white)
             ind2_colors = get_indv_colors(ind2_genos, white)
-            genotype_color_lists.append([ind1_colors, ind2_colors])
+            genotype_color_lists.append([ind2_colors, ind1_colors])  # put first colors of the second individual, to
+            # have a complete correspondence between the final pairs file and the figure
 
     fig, ax = plt.subplots()
 
@@ -114,60 +115,66 @@ def generate_graph(indv_dict):
     ax.set_xticks(range(0, all_markers + len(white) + 5, 5))  # x-axis limits
     plt.rc('font', size=4)
 
-    range_of_ys = range(int((all_markers + 10) / 10), all_markers + 10, int((all_markers + 10) / 10))[:10]  # start,
+    range_of_ys = range(int((all_markers + 10) / 10), all_markers + 10, int((all_markers + 10) / 10))[:10][::-1]  # start,
     # stop, step (7, 72, 7); first 10 values only
 
     for y, color_list_indvs, l_name in zip(range_of_ys, genotype_color_lists, line_names):
-
         if len(ax.set_xticks(range(0, all_markers + len(white) + 5, 5))) < 15:
-            ax.text(-5, y-0.5, l_name[0])
-            ax.text(-5, y+max(plt.ylim(0, all_markers + int(all_markers/4))) / 60, l_name[1])
+            # add the second individual of the pair below the first individual
+            ax.text(-5, y-0.5, l_name[1], size=7)
+            ax.text(-5, y+max(plt.ylim(0, all_markers + int(all_markers/4))) / 60, l_name[0], size=7)
         else:
-            ax.text(-10, y - 0.5, l_name[0])
-            ax.text(-10, y + max(plt.ylim(0, all_markers + int(all_markers / 4))) / 60, l_name[1])
+            # add the second individual of the pair below the first individual
+            ax.text(-10, y - 0.5, l_name[1], size=7)
+            ax.text(-10, y + max(plt.ylim(0, all_markers + int(all_markers / 4))) / 60, l_name[0], size=7)
 
         r = -1
         c_index = 0
+        # add chromosome names
         for c1, c2, x in zip(color_list_indvs[0], color_list_indvs[1], range(1, all_markers + len(white)+1, 1)):
             r += 1
-            if x == 1 and y == max(range_of_ys):  # -int((all_markers + 20) / 10):
-                ax.text(x-0.7, y+(max(plt.ylim(0, all_markers + int(all_markers/4))) / 60)*2.5, chromosomes[0])
+            if x == 1 and y == max(range_of_ys):
+                ax.text(x-0.7, y+(max(plt.ylim(0, all_markers + int(all_markers/4))) / 60)*2.5, chromosomes[0], size=8,
+                        fontdict=None)
 
-            if c1 == 'white' and y == max(range_of_ys):  # -int((all_markers + 20) / 10):
+            if c1 == 'white' and y == max(range_of_ys):
                 c_index += 1
-                ax.text(range(1, all_markers + len(white)+1, 1)[r+1] - 0.7, y + (max(plt.ylim(0, all_markers + int(all_markers/4))) / 60)*2.5, chromosomes[c_index])
+                ax.text(range(1, all_markers + len(white)+1, 1)[r+1] - 0.7, y + (max(plt.ylim(0, all_markers +
+                                                                                              int(all_markers/4))) /
+                                                                                 60)*2.5, chromosomes[c_index], size=8)
                 continue
 
             if c1 == 'white':
                 continue
 
             ax.add_patch(Rectangle((x-0.7, y-0.5), 1, max(plt.ylim(0, all_markers + int(all_markers/4))) / 60,
-                                   ec='darkgrey', linewidth=0.2, color=c1))
+                                   ec='black', linewidth=0.2, color=c1))
+
             ax.add_patch(Rectangle((x-0.7, y + max(plt.ylim(0, all_markers + int(all_markers/4))) / 60), 1,
-                                   max(plt.ylim(0, all_markers + int(all_markers/4))) / 60, ec='darkgrey', linewidth=0.2,
+                                   max(plt.ylim(0, all_markers + int(all_markers/4))) / 60, ec='black', linewidth=0.2,
                                    color=c2))
 
             if y < range_of_ys[-1]:
                 ax.axhline(y+int(int((all_markers + 10) / 10)/2)+1, xmin=0, xmax=1, lw=0.5, color='darkgrey')
 
     custom_lines = [Line2D([0], [0], color='salmon', lw=4),
-                    Line2D([0], [0], color='palegreen', lw=4),
+                    Line2D([0], [0], color='lightblue', lw=4),
                     Line2D([0], [0], color='yellow', lw=4),
-                    Line2D([0], [0], color='lightgrey', lw=4)]
+                    Line2D([0], [0], color='lightgray', lw=4)]
 
-    ax.legend(custom_lines, ['A', 'B', 'H', 'missing'], loc='lower center', ncol=4, frameon=False)
+    ax.legend(custom_lines, ['A', 'B', 'H', 'missing'], loc='lower center', ncol=4, frameon=False, fontsize=8)
 
     ax.axes.get_xaxis().set_visible(False)
     ax.axes.get_yaxis().set_visible(False)
     for spine in ['top', 'right', 'left', 'bottom']:
         ax.spines[spine].set_visible(False)
 
-    ax.set_facecolor('azure')
-    ax.set_title('Top 10 of selected pairs of invididuals', size=6)
+    # ax.set_facecolor('azure')
+    ax.set_title('Top 10 of selected pairs of invididuals', size=9)
 
     my_dpi = 96
-    plt.savefig('%s.png' % figname_prefix, dpi=my_dpi * 20)
-    plt.savefig('%s.pdf' % figname_prefix, dpi=my_dpi * 20)
+    plt.savefig('%s.png' % figname_prefix, dpi=600)
+    plt.savefig('%s.pdf' % figname_prefix, dpi=300)
     # plt.show()
 
 
