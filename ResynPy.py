@@ -16,7 +16,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Analysis of F2 genotyping data for detection of highly complementary individuals.")
