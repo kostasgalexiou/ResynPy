@@ -235,6 +235,8 @@ def main():
     del(a)
     del(b)
 
+    return
+
 
 if __name__ == '__main__':
     main()
