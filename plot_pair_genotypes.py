@@ -64,9 +64,9 @@ def get_indv_colors(ind_genos, white_pos):
             if geno == 'A':
                 ind_colors.append('salmon')
             elif geno == 'B':
-                ind_colors.append('lightblue')
-            elif geno == 'H':
                 ind_colors.append('yellow')
+            elif geno == 'H':
+                ind_colors.append('lightblue')
             elif geno == '-':
                 ind_colors.append('lightgray')
 
@@ -76,9 +76,9 @@ def get_indv_colors(ind_genos, white_pos):
             if geno == 'A':
                 color = 'salmon'
             elif geno == 'B':
-                color = 'lightblue'
-            elif geno == 'H':
                 color = 'yellow'
+            elif geno == 'H':
+                color = 'lightblue'
             elif geno == '-':
                 color = 'lightgray'
             ind_colors.append(color)
@@ -159,8 +159,8 @@ def generate_graph(indv_dict):
                 ax.axhline(y+int(int((all_markers + 10) / 10)/2)+1, xmin=0, xmax=1, lw=0.5, color='darkgrey')
 
     custom_lines = [Line2D([0], [0], color='salmon', lw=4),
-                    Line2D([0], [0], color='lightblue', lw=4),
                     Line2D([0], [0], color='yellow', lw=4),
+                    Line2D([0], [0], color='lightblue', lw=4),
                     Line2D([0], [0], color='lightgray', lw=4)]
 
     ax.legend(custom_lines, ['A', 'B', 'H', 'missing'], loc='lower center', ncol=4, frameon=False, fontsize=8)
