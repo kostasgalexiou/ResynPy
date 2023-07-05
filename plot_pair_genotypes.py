@@ -62,7 +62,7 @@ def get_indv_colors(ind_genos, white_pos):
 
         if i in white_pos:
             if geno == 'A':
-                ind_colors.append('salmon')
+                ind_colors.append('lightgreen')
             elif geno == 'B':
                 ind_colors.append('yellow')
             elif geno == 'H':
@@ -74,7 +74,7 @@ def get_indv_colors(ind_genos, white_pos):
 
         else:
             if geno == 'A':
-                color = 'salmon'
+                color = 'lightgreen'
             elif geno == 'B':
                 color = 'yellow'
             elif geno == 'H':
@@ -158,7 +158,7 @@ def generate_graph(indv_dict):
             if y < range_of_ys[-1]:
                 ax.axhline(y+int(int((all_markers + 10) / 10)/2)+1, xmin=0, xmax=1, lw=0.5, color='darkgrey')
 
-    custom_lines = [Line2D([0], [0], color='salmon', lw=4),
+    custom_lines = [Line2D([0], [0], color='lightgreen', lw=4),
                     Line2D([0], [0], color='yellow', lw=4),
                     Line2D([0], [0], color='lightblue', lw=4),
                     Line2D([0], [0], color='lightgray', lw=4)]
