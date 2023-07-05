@@ -109,7 +109,8 @@ def generate_graph(indv_dict):
             genotype_color_lists.append([ind2_colors, ind1_colors])  # put first colors of the second individual, to
             # have a complete correspondence between the final pairs file and the figure
 
-    fig, ax = plt.subplots()
+    cm = 1/2.54  # centimeters in inches
+    fig, ax = plt.subplots(figsize=(17*cm, 22.5*cm))
 
     ax.set_ylim(0, all_markers + int(all_markers/4))  # y-axis limits
     ax.set_xticks(range(0, all_markers + len(white) + 5, 5))  # x-axis limits
@@ -173,7 +174,7 @@ def generate_graph(indv_dict):
     ax.set_title('Top 10 of selected pairs of invididuals', size=9)
 
     my_dpi = 96
-    plt.savefig('%s.png' % figname_prefix, dpi=600)
+    plt.savefig('%s.png' % figname_prefix, dpi=300)
     plt.savefig('%s.pdf' % figname_prefix, dpi=300)
     # plt.show()
 
