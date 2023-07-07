@@ -14,9 +14,6 @@ import time
 warnings.filterwarnings("ignore", message="numpy.dtype size changed")
 warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 
-"""It takes ~6min to run the analysis for 2278 individuals, when a score filter of >0.5*ideal_score is applied 
-(~2,590,000 comparisons)."""
-
 
 def logfile(results_dir, string):
     with open('%s/PairComparison.log' % results_dir, 'a') as log:
@@ -96,10 +93,10 @@ def recombination_count(m_file, geno_string):
         for elem in f:
             chrom_list.append(elem.rstrip('\n\r').split('\t')[0])
 
-    # get number of markers per chromosome
+    # get the number of markers per chromosome
     count_dict = collections.OrderedDict(collections.Counter(sorted(chrom_list)))
 
-    # generate strings of genotypes, grouping by number of markers per chromosome.
+    # generate strings of genotypes, grouping by the number of markers per chromosome.
     chr_list = []
     marker_no = 0
     for i, key in enumerate(sorted(count_dict.keys())):
@@ -183,7 +180,7 @@ def main():
             accepted_pairs = 0
             start = time.perf_counter()
             for i, (indv1, indv2) in enumerate(index_pairs):
-                if i % 100000 == 0:
+                if i % 10000 == 0:
                     if i == 0:
                         print('I have started the comparison of {0} individual pairs. Current time --> {1}'.format(len(index_pairs), time.strftime('%X')))
                     else:
