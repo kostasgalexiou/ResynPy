@@ -9,6 +9,7 @@ import sys
 import collections, itertools, warnings, os
 from collections import OrderedDict as od
 import pandas as pd
+import time
 
 warnings.filterwarnings("ignore", message="numpy.dtype size changed")
 warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
@@ -138,8 +139,9 @@ def main():
     scoresfile = sys.argv[4]
     heterozygosity = float(sys.argv[5])
     invar = float(sys.argv[6])
-    pref = sys.argv[7]
-    phased = sys.argv[8]
+    total_score_threshold = float(sys.argv[7])
+    pref = sys.argv[8]
+    phased = sys.argv[9]
     outfile = '/'.join((results_folder, pref + '_selected-pairs.tab'))
 
     with open(outfile, 'w') as out:
@@ -179,13 +181,20 @@ def main():
             discarded_pairs_invar = 0
             discarded_pairs_score = 0
             accepted_pairs = 0
-            for indv1, indv2 in index_pairs:
-
+            start = time.perf_counter()
+            for i, (indv1, indv2) in enumerate(index_pairs):
+                if i % 100000 == 0:
+                    if i == 0:
+                        print('I have started the comparison of {0} individual pairs. Current time --> {1}'.format(len(index_pairs), time.strftime('%X')))
+                    else:
+                        stop = time.perf_counter()
+                        difference = '%.2f' % (float(stop-start)/60)
+                        print('I have analyzed {0} out of {1} pairs in {2} minutes'.format(i, len(index_pairs), difference))
+                        start = time.perf_counter()
                 hetero_avg, score_pair, same_genotypes, same_genotypes_list = hetero_average_and_invariable(
                     genos=new_content, i1_index=indv1, i2_index=indv2, scores=scoresfile)
 
-                # remove pairs with a score less that 80% of the ideal score or pairs whose ratio of
-                # invariable sites is equal or higher than the filter_invar.
+                # filter for invariable sites and total score
                 if float(same_genotypes) / float(ideal_score) >= invar:
                     disc_pair_list.append([new_content[indv1][0] + '|' + new_content[indv2][0],
                                            'invariable genotype ratio: %.2f' %
@@ -193,7 +202,7 @@ def main():
                     discarded_pairs_invar += 1
                     continue
 
-                elif score_pair < 0.8 * float(ideal_score):
+                elif score_pair < total_score_threshold * float(ideal_score):
                     disc_pair_list.append([new_content[indv1][0] + '|' + new_content[indv2][0],
                                            'pair score: %.2f' % score_pair])
                     discarded_pairs_score += 1
