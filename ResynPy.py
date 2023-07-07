@@ -49,7 +49,8 @@ def parse_arguments():
     parser.add_argument('--invariable', metavar='FLOAT', default=0.01,
                         help='Keep individual pairs that have a percentage of AA or '
                              "BB combinations that is lower than the argument's value. [Default: 0.01]")
-
+    parser.add_argument('--score_threshold', metavar='FLOAT', default=0.8,
+                        help='Keep individual pairs with total score higher than FLOAT. [Default: 0.8]')
     parser.add_argument('--hetero', metavar='FLOAT', default=0.5,
                         help="Keep individuals that have a heterozygosity lower than the argument's value. "
                              '[Default: 0.5]')
@@ -92,10 +93,10 @@ def pair_comparison(param, arguments):
     logfile(param, '------\n\n')
     if param.not_phased:
         cmd = ' '.join(('python3 compare_pairs.py', param.genos, param.markers, param.results_dir,
-                        param.scores_file, str(param.hetero), str(param.invariable), param.out_prefix, 'no'))
+                        param.scores_file, str(param.hetero), str(param.invariable), str(param.score_threshold), param.out_prefix, 'no'))
     else:
         cmd = ' '.join(('python3 compare_pairs.py', param.genos, param.markers, param.results_dir,
-                        param.scores_file, str(param.hetero), str(param.invariable), param.out_prefix, 'yes'))
+                        param.scores_file, str(param.hetero), str(param.invariable), str(param.score_threshold), param.out_prefix, 'yes'))
 
     logfile(param, '\t' + cmd + '\n\n')
     os.system(cmd)
@@ -116,12 +117,6 @@ def plot_pairs(param):
     logfile(param, '------\n\n')
 
     logfile(param, '\t' + cmd + '\n\n')
-
-    end = datetime.datetime.now()
-
-    logfile(param, '--------\n')
-    logfile(param, 'End time: ' + str(end) + '\n')
-    logfile(param, '--------\n\n')
 
     return
 
@@ -152,21 +147,45 @@ def main():
 
     pair_comparison(arguments, variable)
 
-    if sys.platform == 'win32':
-        cmd = ' '.join(('python (or python3) plot_pair_genotypes.py', '/'.join((arguments.results_dir,
+    with open(op.join(arguments.results_dir, arguments.out_prefix+'_selected-pairs.tab')) as f:
+        f1 = f.readlines()
+    
+    if len(f1) != 1:
+        if sys.platform == 'win32':
+            cmd = ' '.join(('python (or python3) plot_pair_genotypes.py', '/'.join((arguments.results_dir,
                                                                     arguments.out_prefix + '_selected-pairs.tab')),
-                        arguments.genos, arguments.markers,
-                        arguments.results_dir + '/' + arguments.out_prefix + '_top10pairs'))
+                            arguments.genos, arguments.markers,
+                            arguments.results_dir + '/' + arguments.out_prefix + '_top10pairs'))
 
-        print('\nYou are using a win32 operating system!\n\n')
-        print('\tPlease remember to order manually file {}+_selected-pairs.tab, in order to have the best '
-              'pairs on the top of the list.\n\n'.format(arguments.out_prefix))
-        print('\tAfter ordering {}+_selected-pairs.tab file, run the following command to generate the graphs for the '
-              'top10 pairs:\n\n'.format(arguments.out_prefix))
-        print('\t\t %s' % cmd)
+            print('\nYou are using a win32 operating system!\n\n')
+            print('\tPlease remember to order manually file {}+_selected-pairs.tab, in order to have the best '
+                  'pairs on the top of the list.\n\n'.format(arguments.out_prefix))
+            print('\tAfter ordering {}+_selected-pairs.tab file, run the following command to generate the graphs for the '
+                  'top10 pairs:\n\n'.format(arguments.out_prefix))
+            print('\t\t %s' % cmd)
+        
+            end = datetime.datetime.now()
+            logfile(arguments, '--------\n')
+            logfile(arguments, 'End time: ' + str(end) + '\n')
+            logfile(arguments, '--------\n\n')
 
+        else:
+            plot_pairs(arguments)
+            
+            end = datetime.datetime.now()
+            logfile(arguments, '--------\n')
+            logfile(arguments, 'End time: ' + str(end) + '\n')
+            logfile(arguments, '--------\n\n')
     else:
-        plot_pairs(arguments)
+        print('\n\t!!! Sorry...No pairs could be selected with the parameters used. Consider allowing higher percentage of heterozygosity in your individuals and/or higher percentage of invariable sites. !!!\n')
+        logfile(arguments, "\t!!! Sorry...No pairs could be selected with the parameters used. Consider allowing higher percentage of heterozygosity in your individuals and/or higher percentage of invariable sites. !!!\n\n")
+        
+        end = datetime.datetime.now()
+        logfile(arguments, '--------\n')
+        logfile(arguments, 'End time: ' + str(end) + '\n')
+        logfile(arguments, '--------\n\n')
+        
+        sys.exit(1)
 
 
 if __name__ == '__main__':
