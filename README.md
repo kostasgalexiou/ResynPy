@@ -52,6 +52,7 @@ optional arguments:
   --scores_file FILE  A tab-delimited file containing user-defined scores for the different combinations of genotypes, assigned during the comparison of the individuals. Nucleotides ingenotypes should be
                       separated with a "/". e.g.: A/H<tab>0.75. [Default: scores_default.tab]
   --invariable FLOAT  Keep individual pairs that have a percentage of AA or BB combinations that is lower than FLOAT. [Default: 0.01]
+  --score_threshold FLOAT   Keep individual pairs with a total score higher than FLOAT. [Default: 0.8]
   --hetero FLOAT      Keep individuals with heterozygosity lower than FLOAT. [Default: 0.5]
   --out_prefix STR    Prefix for the output files.[Default: resynpyOut]
 ```
