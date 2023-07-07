@@ -40,7 +40,7 @@ def parse_arguments():
                                                                   'phased. [Default: FALSE]')
 
     parser.add_argument('--scores_file', metavar='FILE', default='scores_default.tab',
-                        help='A tab delimited file containing user-defined scores for '
+                        help='A tab-delimited file containing user-defined scores for '
                              'the different combinations of genotypes, assigned '
                              'during the comparison of the individuals. Nucleotides in'
                              'genotypes should be separated with a "/". '
@@ -48,11 +48,11 @@ def parse_arguments():
 
     parser.add_argument('--invariable', metavar='FLOAT', default=0.01,
                         help='Keep individual pairs that have a percentage of AA or '
-                             "BB combinations that is lower than the argument's value. [Default: 0.01]")
+                             "BB combinations that are lower than FLOAT. [Default: 0.01]")
     parser.add_argument('--score_threshold', metavar='FLOAT', default=0.8,
                         help='Keep individual pairs with total score higher than FLOAT. [Default: 0.8]')
     parser.add_argument('--hetero', metavar='FLOAT', default=0.5,
-                        help="Keep individuals that have a heterozygosity lower than the argument's value. "
+                        help="Keep individuals that have heterozygosity lower than FLOAT. "
                              '[Default: 0.5]')
 
     parser.add_argument('--out_prefix', metavar='STR', help='Prefix for the output files.[Default: resynpyOut]',
