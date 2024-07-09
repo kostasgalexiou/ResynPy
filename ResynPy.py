@@ -14,6 +14,7 @@ import sys
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from plot_pair_genotypes import *
 
 
 def parse_arguments():
@@ -106,17 +107,20 @@ def pair_comparison(param, arguments):
 
 def plot_pairs(param):
 
-    cmd = ' '.join(('python3 plot_pair_genotypes.py', '/'.join((param.results_dir,
+    ind_dict = indv2genos()
+    generate_graph(indv_dict=ind_dict)
+
+    #cmd = ' '.join(('python3 plot_pair_genotypes.py', '/'.join((param.results_dir,
                                                                 param.out_prefix+'_selected-pairs.tab')),
                     param.genos, param.markers, param.results_dir+'/'+param.out_prefix+'_top10pairs'))
 
-    os.system(cmd)
+    #os.system(cmd)
 
     logfile(param, '------\n')
     logfile(param, 'Step 2: Figure generation for the 10 pairs of individuals with the highest score\n')
     logfile(param, '------\n\n')
 
-    logfile(param, '\t' + cmd + '\n\n')
+    #logfile(param, '\t' + cmd + '\n\n')
 
     return
 
