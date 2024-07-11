@@ -127,6 +127,7 @@ def generate_graph(indv_dict, pairs, figname_prefix, markers):
 
         r = -1
         c_index = 0
+
         # add chromosome names
         for c1, c2, x in zip(color_list_indvs[0], color_list_indvs[1], range(1, all_markers + len(white)+1, 1)):
             r += 1
@@ -166,12 +167,9 @@ def generate_graph(indv_dict, pairs, figname_prefix, markers):
     for spine in ['top', 'right', 'left', 'bottom']:
         ax.spines[spine].set_visible(False)
 
-    # ax.set_facecolor('azure')
     ax.set_title('Top 10 of selected pairs of invididuals', size=9)
 
-    my_dpi = 96
     plt.savefig('%s.png' % figname_prefix, dpi=300)
     plt.savefig('%s.pdf' % figname_prefix, dpi=300)
-    # plt.show()
 
     return
