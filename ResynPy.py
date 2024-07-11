@@ -8,10 +8,12 @@ Created on '7/03/19'
 
 import argparse
 import os
+import sys
 import os.path as op
 import datetime
 from plot_pair_genotypes import *
-import cProfile, pstats
+import cProfile
+import pstats
 from compare_pairs import *
 
 
@@ -167,15 +169,16 @@ def main():
     if len(f1) != 1:
         if sys.platform == 'win32':
             cmd = ' '.join(('python (or python3) plot_pair_genotypes.py', '/'.join((arguments.results_dir,
-                                                                    arguments.out_prefix + '_selected-pairs.tab')),
+                                                                                    arguments.out_prefix +
+                                                                                    '_selected-pairs.tab')),
                             arguments.genos, arguments.markers,
                             arguments.results_dir + '/' + arguments.out_prefix + '_top10pairs'))
 
             print('\nYou are using a win32 operating system!\n\n')
             print('\tPlease remember to order manually file {}+_selected-pairs.tab, in order to have the best '
                   'pairs on the top of the list.\n\n'.format(arguments.out_prefix))
-            print('\tAfter ordering {}+_selected-pairs.tab file, run the following command to generate the graphs for the '
-                  'top10 pairs:\n\n'.format(arguments.out_prefix))
+            print('\tAfter ordering {}+_selected-pairs.tab file, run the following command to generate the graphs for '
+                  'the top10 pairs:\n\n'.format(arguments.out_prefix))
             print('\t\t %s' % cmd)
         
             end = datetime.datetime.now()
@@ -191,8 +194,11 @@ def main():
             logfile(arguments, 'End time: ' + str(end) + '\n')
             logfile(arguments, '--------\n\n')
     else:
-        print('\n\t!!! Sorry...No pairs could be selected with the parameters used. Consider allowing higher percentage of heterozygosity in your individuals and/or higher percentage of invariable sites. !!!\n')
-        logfile(arguments, "\t!!! Sorry...No pairs could be selected with the parameters used. Consider allowing higher percentage of heterozygosity in your individuals and/or higher percentage of invariable sites. !!!\n\n")
+        print('\n\t!!! Sorry...No pairs could be selected with the parameters used. Consider allowing higher '
+              'percentage of heterozygosity in your individuals and/or higher percentage of invariable sites. !!!\n')
+        logfile(arguments, "\t!!! Sorry...No pairs could be selected with the parameters used. Consider allowing "
+                           "higher percentage of heterozygosity in your individuals and/or higher percentage of "
+                           "invariable sites. !!!\n\n")
         
         end = datetime.datetime.now()
         logfile(arguments, '--------\n')
@@ -209,4 +215,3 @@ if __name__ == '__main__':
     stats = pstats.Stats(profiler).sort_stats('cumtime')
     stats.dump_stats(argus.cprofile)
     stats.strip_dirs()
-

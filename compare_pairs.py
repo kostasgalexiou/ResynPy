@@ -138,6 +138,12 @@ def run_analysis(infile, marker_file, results_folder, scoresd, heterozygosity, i
 
             logfile(results_folder, '\tComparison Statistics' + '\n')
             logfile(results_folder, '\t---------------------\n\n')
+
+            with open(marker_file) as tmp:
+                tmp1 = tmp.readlines()
+                ideal_score: int = len(tmp1)
+
+            logfile(results_folder, '\t\ttotal number of markers      : ' + str(ideal_score) + '\n')
             logfile(results_folder, '\t\ttotal number of individuals  : ' + str(len(content[1:])) + '\n')
             logfile(results_folder, '\t\tindividuals not meeting\n'
                                     '\t\t  heterozygosity threshold   : ' +
@@ -147,10 +153,6 @@ def run_analysis(infile, marker_file, results_folder, scoresd, heterozygosity, i
                     str((len(new_content[1:]) * (len(new_content[1:]) - 1)) / 2).split('.')[0] + '\n')
 
             index_pairs = list(itertools.combinations(range(1, len(new_content)), 2))
-
-            with open(marker_file) as tmp:
-                tmp1 = tmp.readlines()
-                ideal_score: int = len(tmp1)
 
             disc_pair_list = list()
             discarded_pairs_invar = 0
