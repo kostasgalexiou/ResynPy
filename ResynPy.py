@@ -91,17 +91,6 @@ def pair_comparison(param, arguments):
     logfile(param, 'Step 1: Pairwise comparison of individuals\n')
     logfile(param, '------\n\n')
 
-    # if param.not_phased:
-    #     cmd = ' '.join(('python3 ./ResynPy/compare_pairs.py', param.genos, param.markers, param.results_dir,
-    #                     param.scores_file, str(param.hetero), str(param.invariable), str(param.score_threshold),
-    #                     param.out_prefix, 'no'))
-    # else:
-    #     cmd = ' '.join(('python3 ./ResynPy/compare_pairs.py', param.genos, param.markers, param.results_dir,
-    #                     param.scores_file, str(param.hetero), str(param.invariable), str(param.score_threshold),
-    #                     param.out_prefix, 'yes'))
-    #
-    # logfile(param, '\t' + cmd + '\n\n')
-    # os.system(cmd)
     if param.not_phased:
         phased = 'no'
     else:
@@ -127,17 +116,10 @@ def plot_pairs(param):
     
     ind_dict = indv2genos(param.genos)
     generate_graph(ind_dict, pairs, fig_pref, param.markers)
-    #cmd = ' '.join(('python3 plot_pair_genotypes.py', '/'.join((param.results_dir,
- #                                                               param.out_prefix+'_selected-pairs.tab')),
-#                    param.genos, param.markers, param.results_dir+'/'+param.out_prefix+'_top10pairs'))
-
-    #os.system(cmd)
 
     logfile(param, '------\n')
     logfile(param, 'Step 2: Figure generation for the 10 pairs of individuals with the highest score\n')
     logfile(param, '------\n\n')
-
-    #logfile(param, '\t' + cmd + '\n\n')
 
     return
 
