@@ -98,16 +98,16 @@ During this process, the genotypic profile of each individual is compared with t
 
    - contents of `scores_default.tab`:
 
-         A/A	0
-         B/B	0
-         -/-	0.5
-         H/H	0.5
-         H/-	0.625
-         A/-	0.75
-         B/-	0.75
-         A/H	0.75
-         B/H	0.75
-         A/B	1
+         AA	0
+         BB	0
+         --	0.5
+         HH	0.5
+         H-	0.625
+         A-	0.75
+         B-	0.75
+         AH	0.75
+         BH	0.75
+         AB	1
 
 `--invariable`: We also offer the possibility to filter out pairs of individuals that have a number of genotype identities (A/A or B/B) higher than the threshold float value set by this argument. The use of this argument can speed up the whole comparison process since the pipeline does not proceed to score assignment if the pair is discarded. In theory, there shouldn't be any genotype identity between the two individuals, since the presence of genotype identity implies that the corresponding region of the genome will not contribute to obtaining the near-identical variety when the two individuals are crossed. Therefore, the value of this argument should be as low as possible. Default value: _0.01_
 
@@ -140,6 +140,7 @@ All the output files are saved into the `--results_dir` directory (Default resul
 
    column 7: total number of recombinations in the pair
 
+
    Example of the output file for _unphased_ data:
 
    ```
@@ -166,7 +167,8 @@ All the output files are saved into the `--results_dir` directory (Default resul
 
    A file containing all individuals and/or pairs that have not met the filters set by the user, supplemented with the parameter that did not meet the criteria and its value.
    
-   Example:
+   
+Example:
 
    ```
    PR20CG15-1840-3988	heterozygosity: 0.43
@@ -179,7 +181,7 @@ All the output files are saved into the `--results_dir` directory (Default resul
 - `<prefix>.png`, `<prefix>.pdf`
 
    A figure showing the haplotypes of the individuals in the first 10 selected pairs, in a colour-coded mode. `<prefix>` corresponds to argument `--out_prefix`.
-   
+
 
 - `PairComparison.log`
 
