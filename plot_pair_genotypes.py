@@ -7,12 +7,10 @@
 """
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle, Patch
-import sys
+from matplotlib.patches import Rectangle
 from collections import OrderedDict as od
 from collections import Counter
 from matplotlib.lines import Line2D
-
 
 
 def get_total_markers(markers):
@@ -30,8 +28,8 @@ def get_total_markers(markers):
 
         g_indices = list()
         gap = 0
-        for m in list(number_per_chr.values())[:-1]:
-            gap += m
+        for mu in list(number_per_chr.values())[:-1]:
+            gap += mu
             g_indices.append(gap)
 
         gap_indices = [x - 1 for x in g_indices]  # 0-based
@@ -112,8 +110,8 @@ def generate_graph(indv_dict, pairs, figname_prefix, markers):
     ax.set_xticks(range(0, all_markers + len(white) + 5, 5))  # x-axis limits
     plt.rc('font', size=4)
 
-    range_of_ys = range(int((all_markers + 10) / 10), all_markers + 10, int((all_markers + 10) / 10))[:10][::-1]  # start,
-    # stop, step (7, 72, 7); first 10 values only
+    # start, stop, step (7, 72, 7); first 10 values only
+    range_of_ys = range(int((all_markers + 10) / 10), all_markers + 10, int((all_markers + 10) / 10))[:10][::-1]
 
     for y, color_list_indvs, l_name in zip(range_of_ys, genotype_color_lists, line_names):
         if len(ax.set_xticks(range(0, all_markers + len(white) + 5, 5))) < 15:

@@ -5,10 +5,12 @@ Created on {8/21/18}
 @author: {kalexiou}
 """
 
-import collections, itertools, warnings
-import pandas as pd
+import collections
+import itertools
 import time
-import multiprocessing as mp
+import warnings
+
+import pandas as pd
 
 warnings.filterwarnings("ignore", message="numpy.dtype size changed")
 warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
@@ -159,11 +161,13 @@ def run_analysis(infile, marker_file, results_folder, scoresd, heterozygosity, i
             for i, (indv1, indv2) in enumerate(index_pairs):
                 if i % 10000 == 0:
                     if i == 0:
-                        print('I have started the comparison of {0} individual pairs. Current time --> {1}'.format(len(index_pairs), time.strftime('%X')))
+                        print('I have started the comparison of {0} individual pairs. '
+                              'Current time --> {1}'.format(len(index_pairs), time.strftime('%X')))
                     else:
                         stop = time.perf_counter()
-                        difference = '%.2f' % (float(stop-start)/60)
-                        print('I have analyzed {0} out of {1} pairs in {2} minutes'.format(i, len(index_pairs), difference))
+                        difference: str = '%.2f' % (float(stop-start)/60)
+                        print('I have analyzed {0} out of {1} pairs in {2} minutes'.format(i, len(index_pairs),
+                                                                                           difference))
                         start = time.perf_counter()
                 hetero_avg, same_genotypes, same_genotypes_list = hetero_average_and_invariable(
                     genos=new_content, i1_index=indv1, i2_index=indv2)
@@ -177,10 +181,11 @@ def run_analysis(infile, marker_file, results_folder, scoresd, heterozygosity, i
                     continue
 
                 else:
-                    score_pair = total_score(genos=new_content, i1_index=indv1, i2_index=indv2, scores_dictionary=scoresd)
+                    score_pair = total_score(genos=new_content, i1_index=indv1, i2_index=indv2,
+                                             scores_dictionary=scoresd)
                     if score_pair < float(total_score_threshold) * float(ideal_score):
                         disc_pair_list.append([new_content[indv1][0] + '|' + new_content[indv2][0],
-                                           'pair score: %.2f' % score_pair])
+                                               'pair score: %.2f' % score_pair])
                         discarded_pairs_score += 1
                         continue
 
