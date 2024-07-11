@@ -41,9 +41,8 @@ def parse_arguments():
     parser.add_argument('--scores_file', metavar='FILE', default='scores_default.tab',
                         help='A tab-delimited file containing user-defined scores for '
                              'the different combinations of genotypes, assigned '
-                             'during the comparison of the individuals. Nucleotides in'
-                             'genotypes should be separated with a "/". '
-                             'e.g.: A/H<tab>0.75. [Default: scores_default.tab]')
+                             'during the comparison of the individuals.'
+                             'e.g.: AH<tab>0.75. [Default: scores_default.tab]')
 
     parser.add_argument('--invariable', metavar='FLOAT', default=0.01,
                         help='Keep individual pairs that have a percentage of AA or '
