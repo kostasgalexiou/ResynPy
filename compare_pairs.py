@@ -5,11 +5,10 @@ Created on {8/21/18}
 @author: {kalexiou}
 """
 
-import sys
-import collections, itertools, warnings, os
-from collections import OrderedDict as od
+import collections, itertools, warnings
 import pandas as pd
 import time
+import multiprocessing as mp
 
 warnings.filterwarnings("ignore", message="numpy.dtype size changed")
 warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
@@ -22,28 +21,17 @@ def logfile(results_dir, string):
     return
 
 
-def scoresdict(score_file):
-    scores_dict = od()
-
-    with open(score_file) as f:
-        for line in f:
-            geno, score = line.rstrip('\n\r').split('\t')
-            scores_dict[geno] = float(score)
-
-    return scores_dict
-
-
-def compare(p1, p2, dictionary):
-    pair = '/'.join([p1, p2])
-    reverse_pair = '/'.join([p2, p1])
-
-    score = int()
-    if pair in dictionary.keys():
-        score = dictionary[pair]
-    elif reverse_pair in dictionary.keys():
-        score = dictionary[reverse_pair]
-
-    return score
+# def compare(p1, p2, dictionary):
+#     pair = '/'.join([p1, p2])
+#     reverse_pair = '/'.join([p2, p1])
+#
+#     score = int()
+#     if pair in dictionary.keys():
+#         score = dictionary[pair]
+#     elif reverse_pair in dictionary.keys():
+#         score = dictionary[reverse_pair]
+#
+#     return score
 
 
 def filter_hetero(genotypes, hetero_threshold):
@@ -56,7 +44,7 @@ def filter_hetero(genotypes, hetero_threshold):
         hetero_count = geno_with_info.count('H')
         hetero_ratio = float(hetero_count) / float(len(geno_with_info))
 
-        if hetero_ratio >= hetero_threshold:
+        if hetero_ratio >= float(hetero_threshold):
             disc_list.append([g[0], 'heterozygosity: %.2f' % hetero_ratio])
             d_individuals += 1
             continue
@@ -66,25 +54,55 @@ def filter_hetero(genotypes, hetero_threshold):
     return new_content, disc_list, d_individuals
 
 
-def hetero_average_and_invariable(genos, i1_index, i2_index, scores):
-    hetero1_count = len([x for x in genos[i1_index][1:] if x == 'H'])
+def hetero_average_and_invariable(genos, i1_index, i2_index):
+
+    hetero1_count = genos[i1_index][1:].count('H')
+    hetero2_count = genos[i2_index][1:].count('H')
+
     wInfo1 = len([x for x in genos[i1_index][1:] if x != '-'])
     ratio1 = float(hetero1_count) / float(wInfo1)
-    hetero2_count = len([x for x in genos[i2_index][1:] if x == 'H'])
+
     wInfo2 = len([x for x in genos[i2_index][1:] if x != '-'])
     ratio2 = float(hetero2_count) / float(wInfo2)
+
     average = float(sum([ratio1, ratio2])) / 2
 
     invar_genotypes = 0
-    score_pair = 0
-    invar_genotypes_list = list()
+    invar_genotypes_list = []
+    # invar_genotypes = sum([1 if p1 == p2 and p1 != '-' and p1 != 'H' else 0 for p1, p2 in
+    #                        zip(genos[i1_index][1:], genos[i2_index][1:])])
     for p1, p2 in zip(genos[i1_index][1:], genos[i2_index][1:]):
         if p1 == p2 and p1 != '-' and p1 != 'H':
             invar_genotypes += 1
             invar_genotypes_list.append(p1 + p2)
-        score_pair += compare(p1=p1, p2=p2, dictionary=scoresdict(scores))
 
-    return average, score_pair, invar_genotypes, invar_genotypes_list
+    return average, invar_genotypes, invar_genotypes_list
+
+
+# def total_score(genos, i1_index, i2_index, scores_dictionary):
+#
+#     pairs_genos_count = collections.Counter(sorted([''.join(sorted(p1+p2)) for p1, p2 in zip(genos[i1_index][1:],
+#                                                                                              genos[i2_index][1:])]))
+#     return sum([scores_dictionary[k]*v for k, v in pairs_genos_count.items()])
+
+
+def total_score(genos, i1_index, i2_index, scores_dictionary):
+
+    pairs_genos_count = collections.Counter(sorted([''.join(sorted(p1+p2)) for p1, p2 in zip(genos[i1_index][1:],
+                                                                                             genos[i2_index][1:])]))
+    return sum([scores_dictionary[k]*v for k, v in pairs_genos_count.items()])
+
+
+# def total_score(genos, i1_index, i2_index, scores_dictionary):
+#
+#     s1 = pd.Series(genos[i1_index][1:], name=genos[i1_index][0]).to_frame()
+#     s2 = pd.Series(genos[i2_index][1:], name=genos[i2_index][0]).to_frame()
+#     df = pd.concat([s1, s2], axis=1)
+#     df['combine'] = df.apply(lambda row: ''.join(sorted(row[genos[i1_index][0]]+row[genos[i2_index][0]])), axis=1)
+#     pairs_genos_count = df['combine'].value_counts().to_dict()
+#     # pairs_genos_count = collections.Counter(sorted([''.join(sorted(p1+p2)) for p1, p2 in zip(genos[i1_index][1:],
+#     #                                                                                          genos[i2_index][1:])]))
+#     return sum([scores_dictionary[k]*v for k, v in pairs_genos_count.items()])
 
 
 def recombination_count(m_file, geno_string):
@@ -129,16 +147,66 @@ def save_discarded(res_dir, prefix, list_of_discarded):
     return
 
 
-def main():
-    infile = sys.argv[1]
-    marker_file = sys.argv[2]
-    results_folder = sys.argv[3]
-    scoresfile = sys.argv[4]
-    heterozygosity = float(sys.argv[5])
-    invar = float(sys.argv[6])
-    total_score_threshold = float(sys.argv[7])
-    pref = sys.argv[8]
-    phased = sys.argv[9]
+# def new_fun(index_pair, new_cont, scoresdic, idealscore, invar, disc_pair_list, total_score_threshold, phased, mfile, out,
+#             discarded_pairs_invar=0, discarded_pairs_score=0, accepted_pairs=0):
+#     # if i % 10000 == 0:
+#     #     if i == 0:
+#     #         print('I have started the comparison of {0} individual pairs. Current time --> {1}'.format(len(index_pairs),
+#     #                                                                                                    time.strftime(
+#     #                                                                                                        '%X')))
+#     #     else:
+#     #         stop = time.perf_counter()
+#     #         difference = '%.2f' % (float(stop - start_time) / 60)
+#     #         print('I have analyzed {0} out of {1} pairs in {2} minutes'.format(i, len(index_pairs), difference))
+#     #         start = time.perf_counter()
+#     indv1, indv2 = index_pair
+#     hetero_avg, same_genotypes, same_genotypes_list = hetero_average_and_invariable(
+#         genos=new_cont, i1_index=indv1, i2_index=indv2)
+#
+#     score_pair = total_score(genos=new_cont, i1_index=indv1, i2_index=indv2, scores_dictionary=scoresdic)
+#
+#     # filter for invariable sites and total score
+#     if float(same_genotypes) / float(idealscore) >= float(invar):
+#         disc_pair_list.append([new_cont[indv1][0] + '|' + new_cont[indv2][0],
+#                                'invariable genotype ratio: %.2f' %
+#                                (float(same_genotypes) / float(idealscore))])
+#         discarded_pairs_invar += 1
+#
+#     elif score_pair < float(total_score_threshold) * float(idealscore):
+#         disc_pair_list.append([new_cont[indv1][0] + '|' + new_cont[indv2][0],
+#                                'pair score: %.2f' % score_pair])
+#         discarded_pairs_score += 1
+#
+#     aa_counts = same_genotypes_list.count('AA')
+#     bb_counts = same_genotypes_list.count('BB')
+#     invar_counts = aa_counts + bb_counts
+#
+#     accepted_pairs += 1
+#     if phased == 'yes':
+#         rec_count1 = recombination_count(m_file=mfile, geno_string=new_cont[indv1][1:])
+#         rec_count2 = recombination_count(m_file=mfile, geno_string=new_cont[indv2][1:])
+#         out.writelines('\t'.join(('|'.join((new_cont[indv1][0], new_cont[indv2][0])),
+#                                   str(score_pair), str(invar_counts), '%.2f' % hetero_avg,
+#                                   str(rec_count1), str(rec_count2), str(rec_count1 + rec_count2) + '\n'
+#                                   )))
+#     else:
+#         out.writelines('\t'.join(('|'.join((new_cont[indv1][0], new_cont[indv2][0])),
+#                                   str(score_pair), str(invar_counts), '%.2f' % hetero_avg + '\n')))
+#
+#     return
+
+
+def run_analysis(infile, marker_file, results_folder, scoresd, heterozygosity, invar, total_score_threshold, pref,
+                 phased):
+    # infile = sys.argv[1]
+    # marker_file = sys.argv[2]
+    # results_folder = sys.argv[3]
+    # scoresfile = sys.argv[4]
+    # heterozygosity = float(sys.argv[5])
+    # invar = float(sys.argv[6])
+    # total_score_threshold = float(sys.argv[7])
+    # pref = sys.argv[8]
+    # phased = sys.argv[9]
     outfile = '/'.join((results_folder, pref + '_selected-pairs.tab'))
 
     with open(outfile, 'w') as out:
@@ -179,6 +247,9 @@ def main():
             discarded_pairs_score = 0
             accepted_pairs = 0
             start = time.perf_counter()
+
+            # pool = mp.Pool(4)
+            # pool.map(new_fun(), index_pairs)
             for i, (indv1, indv2) in enumerate(index_pairs):
                 if i % 10000 == 0:
                     if i == 0:
@@ -188,22 +259,24 @@ def main():
                         difference = '%.2f' % (float(stop-start)/60)
                         print('I have analyzed {0} out of {1} pairs in {2} minutes'.format(i, len(index_pairs), difference))
                         start = time.perf_counter()
-                hetero_avg, score_pair, same_genotypes, same_genotypes_list = hetero_average_and_invariable(
-                    genos=new_content, i1_index=indv1, i2_index=indv2, scores=scoresfile)
+                hetero_avg, same_genotypes, same_genotypes_list = hetero_average_and_invariable(
+                    genos=new_content, i1_index=indv1, i2_index=indv2)
 
                 # filter for invariable sites and total score
-                if float(same_genotypes) / float(ideal_score) >= invar:
+                if float(same_genotypes) / float(ideal_score) >= float(invar):
                     disc_pair_list.append([new_content[indv1][0] + '|' + new_content[indv2][0],
                                            'invariable genotype ratio: %.2f' %
                                            (float(same_genotypes) / float(ideal_score))])
                     discarded_pairs_invar += 1
                     continue
 
-                elif score_pair < total_score_threshold * float(ideal_score):
-                    disc_pair_list.append([new_content[indv1][0] + '|' + new_content[indv2][0],
+                else:
+                    score_pair = total_score(genos=new_content, i1_index=indv1, i2_index=indv2, scores_dictionary=scoresd)
+                    if score_pair < float(total_score_threshold) * float(ideal_score):
+                        disc_pair_list.append([new_content[indv1][0] + '|' + new_content[indv2][0],
                                            'pair score: %.2f' % score_pair])
-                    discarded_pairs_score += 1
-                    continue
+                        discarded_pairs_score += 1
+                        continue
 
                 aa_counts = same_genotypes_list.count('AA')
                 bb_counts = same_genotypes_list.count('BB')
@@ -242,7 +315,3 @@ def main():
     del(b)
 
     return
-
-
-if __name__ == '__main__':
-    main()

@@ -10,11 +10,9 @@ import argparse
 import os
 import os.path as op
 import datetime
-import sys
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 from plot_pair_genotypes import *
+import cProfile, pstats
+from compare_pairs import *
 
 
 def parse_arguments():
@@ -58,6 +56,7 @@ def parse_arguments():
 
     parser.add_argument('--out_prefix', metavar='STR', help='Prefix for the output files.[Default: resynpyOut]',
                         default='resynpyOut')
+    parser.add_argument('--cprofile', metavar='STR', help='')
 
     variables = vars(parser.parse_args())
 
@@ -92,27 +91,46 @@ def pair_comparison(param, arguments):
     logfile(param, '------\n')
     logfile(param, 'Step 1: Pairwise comparison of individuals\n')
     logfile(param, '------\n\n')
-    if param.not_phased:
-        cmd = ' '.join(('python3 compare_pairs.py', param.genos, param.markers, param.results_dir,
-                        param.scores_file, str(param.hetero), str(param.invariable), str(param.score_threshold), param.out_prefix, 'no'))
-    else:
-        cmd = ' '.join(('python3 compare_pairs.py', param.genos, param.markers, param.results_dir,
-                        param.scores_file, str(param.hetero), str(param.invariable), str(param.score_threshold), param.out_prefix, 'yes'))
 
-    logfile(param, '\t' + cmd + '\n\n')
-    os.system(cmd)
+    # if param.not_phased:
+    #     cmd = ' '.join(('python3 ./ResynPy/compare_pairs.py', param.genos, param.markers, param.results_dir,
+    #                     param.scores_file, str(param.hetero), str(param.invariable), str(param.score_threshold),
+    #                     param.out_prefix, 'no'))
+    # else:
+    #     cmd = ' '.join(('python3 ./ResynPy/compare_pairs.py', param.genos, param.markers, param.results_dir,
+    #                     param.scores_file, str(param.hetero), str(param.invariable), str(param.score_threshold),
+    #                     param.out_prefix, 'yes'))
+    #
+    # logfile(param, '\t' + cmd + '\n\n')
+    # os.system(cmd)
+    if param.not_phased:
+        phased = 'no'
+    else:
+        phased = 'yes'
+
+    run_analysis(param.genos,
+                 param.markers,
+                 param.results_dir,
+                 scoresdict(param.scores_file),
+                 param.hetero,
+                 param.invariable,
+                 param.score_threshold,
+                 param.out_prefix,
+                 phased)
 
     return
 
 
 def plot_pairs(param):
 
-    ind_dict = indv2genos()
-    generate_graph(indv_dict=ind_dict)
-
+    pairs = '/'.join((param.results_dir, param.out_prefix+'_selected-pairs.tab'))
+    fig_pref = param.results_dir+'/'+param.out_prefix+'_top10pairs'
+    
+    ind_dict = indv2genos(param.genos)
+    generate_graph(ind_dict, pairs, fig_pref, param.markers)
     #cmd = ' '.join(('python3 plot_pair_genotypes.py', '/'.join((param.results_dir,
-                                                                param.out_prefix+'_selected-pairs.tab')),
-                    param.genos, param.markers, param.results_dir+'/'+param.out_prefix+'_top10pairs'))
+ #                                                               param.out_prefix+'_selected-pairs.tab')),
+#                    param.genos, param.markers, param.results_dir+'/'+param.out_prefix+'_top10pairs'))
 
     #os.system(cmd)
 
@@ -138,6 +156,17 @@ def roh_write_variables(param, args):
             v = v
 
         logfile(param, '\t' + k + ': ' + str(v) + '\n')
+
+
+def scoresdict(s_file):
+    scores_dict = od()
+
+    with open(s_file) as f:
+        for line in f:
+            geno, score = line.rstrip('\n\r').split('\t')
+            scores_dict[''.join(sorted(geno))] = float(score)
+
+    return scores_dict
 
 
 def main():
@@ -189,8 +218,14 @@ def main():
         logfile(arguments, 'End time: ' + str(end) + '\n')
         logfile(arguments, '--------\n\n')
         
-        sys.exit(1)
-
 
 if __name__ == '__main__':
+    argus, __ = parse_arguments()
+    profiler = cProfile.Profile()
+    profiler.enable()
     main()
+    profiler.disable()
+    stats = pstats.Stats(profiler).sort_stats('cumtime')
+    stats.dump_stats(argus.cprofile)
+    stats.strip_dirs()
+

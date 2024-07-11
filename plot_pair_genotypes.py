@@ -13,13 +13,9 @@ from collections import OrderedDict as od
 from collections import Counter
 from matplotlib.lines import Line2D
 
-pairs = sys.argv[1]  # compare_pairs.py output
-genotypes = sys.argv[2]  # genotyping data
-markers = sys.argv[3]
-figname_prefix = sys.argv[4]
 
 
-def get_total_markers():
+def get_total_markers(markers):
     # get number of markers and number of markers per chromosome
     with open(markers) as m:
         m1 = m.readlines()
@@ -43,14 +39,15 @@ def get_total_markers():
     return total_markers, gap_indices, chr_list_unique
 
 
-def indv2genos():  # get the correspondence of individual to its genotype
+def indv2genos(genotypes):  # get the correspondence of individual to its genotype
+
     dictionary = od()
     with open(genotypes) as f:
         f_list = f.readlines()
         for i in f_list[1:]:
             individual = i.rstrip('\n\r').split('\t')[0]
-            genos = ','.join(i.rstrip('\n\r').split('\t')[1:])
-            dictionary[individual] = genos
+            gs = ','.join(i.rstrip('\n\r').split('\t')[1:])
+            dictionary[individual] = gs
 
     return dictionary
 
@@ -86,9 +83,9 @@ def get_indv_colors(ind_genos, white_pos):
     return ind_colors
 
 
-def generate_graph(indv_dict):
+def generate_graph(indv_dict, pairs, figname_prefix, markers):
 
-    all_markers, white, chromosomes = get_total_markers()
+    all_markers, white, chromosomes = get_total_markers(markers)
 
     with open(pairs) as f:
 
@@ -100,7 +97,6 @@ def generate_graph(indv_dict):
 
             pair = n.rstrip('\n\r').split('\t')[0].split('|')
             line_names.append(pair)
-
             ind1_genos = indv_dict[pair[0]].split(',')
             ind2_genos = indv_dict[pair[1]].split(',')
 
@@ -178,8 +174,4 @@ def generate_graph(indv_dict):
     plt.savefig('%s.pdf' % figname_prefix, dpi=300)
     # plt.show()
 
-
-if __name__ == '__main__':
-
-    ind_dict = indv2genos()
-    generate_graph(indv_dict=ind_dict)
+    return
