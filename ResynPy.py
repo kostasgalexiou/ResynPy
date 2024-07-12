@@ -21,18 +21,18 @@ def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Analysis of F2 genotyping data for detection of highly complementary individuals.")
 
-    parser.add_argument('--genos', metavar='TAB FILE',
+    parser.add_argument('--genos', metavar='TAB FILE', required=True,
                         help='Tab-delimited file (.tab) containing the '
                              'genotyping data of the F2 population. Markers '
                              'should be in columns and individuals in '
                              'rows. Genotypes should be in the format '
                              '"A,B,H,-", where "-" represents missing data. This argument has to be used together '
-                             'with --markers')
+                             'with --markers. [Required]')
 
-    parser.add_argument('--markers', metavar='TAB FILE',
+    parser.add_argument('--markers', metavar='TAB FILE', required=True,
                         help='A 2-column tab-delimited file with the markers used for the F2 genotyping, in the format '
                              'of "chromosome<tab>marker name". Marker order per chromosome should match that of '
-                             'markers in the genotyping file.')
+                             'markers in the genotyping file. [Required]')
 
     parser.add_argument('--results_dir', metavar='STR', default='ResynPy_results',
                         help='Name of the results directory [Default: ResynPy_results]')
@@ -40,12 +40,11 @@ def parse_arguments():
     parser.add_argument('--not_phased', action='store_true', help='Use this argument if your genotyping data are not '
                                                                   'phased. [Default: FALSE]')
 
-    parser.add_argument('--scores_file', metavar='FILE', default='scores_default.tab',
+    parser.add_argument('--scores_file', metavar='FILE', required=True,
                         help='A tab-delimited file containing user-defined scores for '
                              'the different combinations of genotypes, assigned '
-                             'during the comparison of the individuals.'
-                             'e.g.: AH<tab>0.75. [Default: scores_default.tab]')
-
+                             'during the comparison of the individuals. If not one available, the user can use the '
+                             'scores_default.tab file found in the downloaded github directory. [Required]')
     parser.add_argument('--invariable', metavar='FLOAT', default=0.01,
                         help='Keep individual pairs that have a ratio of AA or '
                              "BB combinations that are lower than FLOAT. [Default: 0.01]")
@@ -54,7 +53,6 @@ def parse_arguments():
     parser.add_argument('--hetero', metavar='FLOAT', default=0.5,
                         help="Keep individuals that have heterozygosity ratio lower than FLOAT. "
                              '[Default: 0.5]')
-
     parser.add_argument('--out_prefix', metavar='STR', help='Prefix for the output files.[Default: resynpyOut]',
                         default='resynpyOut')
     parser.add_argument('--cprofile', metavar='STR', help='')
