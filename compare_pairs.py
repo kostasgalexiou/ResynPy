@@ -47,6 +47,10 @@ def hetero_average_and_invariable(genos, i1_index, i2_index):
 
     hetero1_count = genos[i1_index][1:].count('H')
     hetero2_count = genos[i2_index][1:].count('H')
+    both_heteros_count = len([i for i, (a, b) in enumerate(zip(genos[i1_index][1:], genos[i2_index][1:])) if a == b
+                              and a == 'H'])
+    only1_hetero = hetero1_count - both_heteros_count
+    only2_hetero = hetero2_count - both_heteros_count
 
     winfo1 = len([x for x in genos[i1_index][1:] if x != '-'])
     ratio1 = float(hetero1_count) / float(winfo1)
@@ -54,23 +58,23 @@ def hetero_average_and_invariable(genos, i1_index, i2_index):
     winfo2 = len([x for x in genos[i2_index][1:] if x != '-'])
     ratio2 = float(hetero2_count) / float(winfo2)
 
-    average = float(sum([ratio1, ratio2])) / 2
+    heterozygosities = '|'.join(('%.2f' % ratio1, '%.2f' % ratio2))
 
-    invar_genotypes = 0
     invar_genotypes_list = []
     for p1, p2 in zip(genos[i1_index][1:], genos[i2_index][1:]):
         if p1 == p2 and p1 != '-' and p1 != 'H':
-            invar_genotypes += 1
             invar_genotypes_list.append(p1 + p2)
 
-    return average, invar_genotypes, invar_genotypes_list
+    return heterozygosities, len(invar_genotypes_list), invar_genotypes_list, only1_hetero, only2_hetero
 
 
 def total_score(genos, i1_index, i2_index, scores_dictionary):
 
     pairs_genos_count = collections.Counter(sorted([''.join(sorted(p1+p2)) for p1, p2 in zip(genos[i1_index][1:],
                                                                                              genos[i2_index][1:])]))
-    return sum([scores_dictionary[k]*v for k, v in pairs_genos_count.items()])
+
+    hh_count = pairs_genos_count['HH']
+    return sum([scores_dictionary[k]*v for k, v in pairs_genos_count.items()]), hh_count
 
 
 def recombination_count(m_file, geno_string):
@@ -123,10 +127,11 @@ def run_analysis(infile, marker_file, results_folder, scoresd, heterozygosity, i
     with open(outfile, 'w') as out:
 
         if phased == 'yes':
-            out.writelines('\t'.join(('#indiv_pair', 'score', 'invariable_pairs', 'average_heterozygosity',
-                                      'recomb_no1', 'recomb_no2', 'sum_recomb\n',)))
+            out.writelines('\t'.join(('#indiv_pair', 'score', 'invariable_pairs', 'hetero1|hetero2',
+                                      'recomb_no1', 'recomb_no2', 'sum_recomb', 'similarity_to_hybrid\n')))
         else:
-            out.writelines('\t'.join(('#indiv_pair', 'score', 'invariable_pairs', 'average_heterozygosity\n')))
+            out.writelines('\t'.join(('#indiv_pair', 'score', 'invariable_pairs', 'hetero1|hetero2',
+                                      'similarity_to_hybrid\n')))
 
         with open(infile, "rt") as f:
 
@@ -167,11 +172,12 @@ def run_analysis(infile, marker_file, results_folder, scoresd, heterozygosity, i
                               'Current time --> {1}'.format(len(index_pairs), time.strftime('%X')))
                     else:
                         stop = time.perf_counter()
-                        difference: str = '%.2f' % (float(stop-start)/60)
-                        print('I have analyzed {0} out of {1} pairs in {2} minutes'.format(i, len(index_pairs),
+                        difference: str = '%.2f' % (float(stop-start))
+                        print('I have analyzed {0} out of {1} pairs in {2} seconds'.format(i, len(index_pairs),
                                                                                            difference))
                         start = time.perf_counter()
-                hetero_avg, same_genotypes, same_genotypes_list = hetero_average_and_invariable(
+
+                heteros, same_genotypes, same_genotypes_list, het_only1, het_only2 = hetero_average_and_invariable(
                     genos=new_content, i1_index=indv1, i2_index=indv2)
 
                 # filter for invariable sites and total score
@@ -183,7 +189,8 @@ def run_analysis(infile, marker_file, results_folder, scoresd, heterozygosity, i
                     continue
 
                 else:
-                    score_pair = total_score(genos=new_content, i1_index=indv1, i2_index=indv2,
+
+                    score_pair, hhcount = total_score(genos=new_content, i1_index=indv1, i2_index=indv2,
                                              scores_dictionary=scoresd)
                     if score_pair < float(total_score_threshold) * float(ideal_score):
                         disc_pair_list.append([new_content[indv1][0] + '|' + new_content[indv2][0],
@@ -195,17 +202,23 @@ def run_analysis(infile, marker_file, results_folder, scoresd, heterozygosity, i
                 bb_counts = same_genotypes_list.count('BB')
                 invar_counts = aa_counts + bb_counts
 
+                similarity_higher = '%.2f' % float((ideal_score - invar_counts)*100/ideal_score)
+                similarity_lower = '%.2f' % float((ideal_score - (invar_counts + hhcount + het_only1 +
+                                                                  het_only2))*100/ideal_score)
+
                 accepted_pairs += 1
                 if phased == 'yes':
                     rec_count1 = recombination_count(m_file=marker_file, geno_string=new_content[indv1][1:])
                     rec_count2 = recombination_count(m_file=marker_file, geno_string=new_content[indv2][1:])
                     out.writelines('\t'.join(('|'.join((new_content[indv1][0], new_content[indv2][0])),
-                                              str(score_pair), str(invar_counts), '%.2f' % hetero_avg,
-                                              str(rec_count1), str(rec_count2), str(rec_count1 + rec_count2) + '\n'
+                                              str(score_pair), str(invar_counts), heteros,
+                                              str(rec_count1), str(rec_count2), str(rec_count1 + rec_count2),
+                                              '-'.join((similarity_lower, similarity_higher)) + '\n'
                                               )))
                 else:
                     out.writelines('\t'.join(('|'.join((new_content[indv1][0], new_content[indv2][0])),
-                                              str(score_pair), str(invar_counts), '%.2f' % hetero_avg + '\n')))
+                                              str(score_pair), str(invar_counts), heteros,
+                                              '-'.join((similarity_lower, similarity_higher)) + '\n')))
 
             logfile(results_folder, '\t\tdiscarded pairs due to score : ' +
                     str(discarded_pairs_score) + '\n')
