@@ -165,8 +165,6 @@ def generate_graph(indv_dict, pairs, figname_prefix, markers):
     for spine in ['top', 'right', 'left', 'bottom']:
         ax.spines[spine].set_visible(False)
 
-    ax.set_title('Top 10 of selected pairs of invididuals', size=9)
-
     plt.savefig('%s.png' % figname_prefix, dpi=300)
     plt.savefig('%s.pdf' % figname_prefix, dpi=300)
 
