@@ -52,7 +52,6 @@ def parse_arguments():
                              '[Default: 0.5]')
     parser.add_argument('--out_prefix', metavar='STR', help='Prefix for the output files.[Default: resynpyOut]',
                         default='resynpyOut')
-    parser.add_argument('--cprofile', metavar='STR', help='')
 
     variables = vars(parser.parse_args())
 
@@ -208,5 +207,4 @@ if __name__ == '__main__':
     main()
     profiler.disable()
     stats = pstats.Stats(profiler).sort_stats('cumtime')
-    stats.dump_stats(argus.cprofile)
     stats.strip_dirs()
