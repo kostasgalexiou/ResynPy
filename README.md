@@ -153,23 +153,23 @@ All the output files are saved into the `--results_dir` directory (Default resul
    Example of the output file for _unphased_ data:
 
    ```
-#indiv_pair          score	invariable_pairs	hetero1|hetero2	similarity_to_hybrid
-SDF2-343|SDF2-386	55.0	0	0.23|0.20	66.13-100.00
-SDF2-37|SDF2-217	53.75	0	0.26|0.27	56.45-100.00
-SDF2-131|SDF2-180	52.875	0	0.31|0.27	43.55-100.00
-SDF2-28|SDF2-365	52.25	0	0.24|0.37	50.00-100.00
-SDF2-200|SDF2-217	52.0	0	0.36|0.27	45.16-100.00
+    #indiv_pair          score	invariable_pairs	hetero1|hetero2	similarity_to_hybrid
+    SDF2-343|SDF2-386	55.0	0	0.23|0.20	66.13-100.00
+    SDF2-37|SDF2-217	53.75	0	0.26|0.27	56.45-100.00
+    SDF2-131|SDF2-180	52.875	0	0.31|0.27	43.55-100.00
+    SDF2-28|SDF2-365	52.25	0	0.24|0.37	50.00-100.00
+    SDF2-200|SDF2-217	52.0	0	0.36|0.27	45.16-100.00
    ```
 
    Example of the output file for _phased_ data:
 
    ```
-#indiv_pair	     score   invariable_pairs   hetero1|hetero2 similarity_to_hybrid   recomb_no1  recomb_no2  sum_recomb
-SDF2-343|SDF2-386    55.0    0	                0.23|0.20	66.13-100.00           0           0           0
-SDF2-37|SDF2-217     53.75   0	                0.26|0.27	56.45-100.00           0           0           0
-SDF2-131|SDF2-180    52.875  0	                0.31|0.27	3.55-100.00            1           0           1
-SDF2-28|SDF2-365     52.20   0	                0.24|0.37	50.00-100.00           2           0           2
-SDF2-200|SDF2-217    52.0    0	                0.36|0.27	45.16-100.00           1           0           1
+    #indiv_pair	     score   invariable_pairs   hetero1|hetero2 similarity_to_hybrid   recomb_no1  recomb_no2  sum_recomb
+    SDF2-343|SDF2-386    55.0    0	                0.23|0.20	66.13-100.00           0           0           0
+    SDF2-37|SDF2-217     53.75   0	                0.26|0.27	56.45-100.00           0           0           0
+    SDF2-131|SDF2-180    52.875  0	                0.31|0.27	3.55-100.00            1           0           1
+    SDF2-28|SDF2-365     52.20   0	                0.24|0.37	50.00-100.00           2           0           2
+    SDF2-200|SDF2-217    52.0    0	                0.36|0.27	45.16-100.00           1           0           1
    ```
 
 - `discarded_individuals_and_pairs.tab`
