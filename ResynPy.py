@@ -32,11 +32,12 @@ def parse_arguments():
                         help='A 2-column tab-delimited file with the markers used for the F2 genotyping, in the format '
                              'of "chromosome<tab>marker name". Marker order per chromosome should match that of '
                              'markers in the genotyping file. [Required]')
-    parser.add_argument('--scores_file', metavar='FILE', required=True,
+    parser.add_argument('--scores_file', metavar='FILE', default='ResynPy/scores_default.tab',
                         help='A tab-delimited file containing user-defined scores for '
                              'the different combinations of genotypes, assigned '
                              'during the comparison of the individuals. If not one available, the user can use the '
-                             'scores_default.tab file found in the downloaded github directory. [Required]')
+                             'scores_default.tab file found in the downloaded github directory. '
+                             '[Default: ResynPy/scores_default.tab]')
     parser.add_argument('--results_dir', metavar='STR', default='ResynPy_results',
                         help='Name of the results directory [Default: ResynPy_results]')
     parser.add_argument('--not_phased', action='store_true', help='Use this argument if your genotyping data are not '

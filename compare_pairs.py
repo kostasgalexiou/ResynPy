@@ -128,7 +128,7 @@ def run_analysis(infile, marker_file, results_folder, scoresd, heterozygosity, i
 
         if phased == 'yes':
             out.writelines('\t'.join(('#indiv_pair', 'score', 'invariable_pairs', 'hetero1|hetero2',
-                                      'recomb_no1', 'recomb_no2', 'sum_recomb', 'similarity_to_hybrid\n')))
+                                      'similarity_to_hybrid', 'recomb_no1', 'recomb_no2', 'sum_recomb\n')))
         else:
             out.writelines('\t'.join(('#indiv_pair', 'score', 'invariable_pairs', 'hetero1|hetero2',
                                       'similarity_to_hybrid\n')))
@@ -212,8 +212,8 @@ def run_analysis(infile, marker_file, results_folder, scoresd, heterozygosity, i
                     rec_count2 = recombination_count(m_file=marker_file, geno_string=new_content[indv2][1:])
                     out.writelines('\t'.join(('|'.join((new_content[indv1][0], new_content[indv2][0])),
                                               str(score_pair), str(invar_counts), heteros,
-                                              str(rec_count1), str(rec_count2), str(rec_count1 + rec_count2),
-                                              '-'.join((similarity_lower, similarity_higher)) + '\n'
+                                              '-'.join((similarity_lower, similarity_higher)),
+                                              str(rec_count1), str(rec_count2), str(rec_count1 + rec_count2) + '\n'
                                               )))
                 else:
                     out.writelines('\t'.join(('|'.join((new_content[indv1][0], new_content[indv2][0])),
