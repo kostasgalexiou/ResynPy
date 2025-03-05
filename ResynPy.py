@@ -273,5 +273,4 @@ def main():
 
 
 if __name__ == '__main__':
-    argus, __ = parse_arguments()
     main()
