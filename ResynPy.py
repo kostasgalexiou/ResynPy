@@ -11,6 +11,7 @@ import os
 import sys
 import os.path as op
 import datetime
+import multiprocessing as mp
 from plot_pair_genotypes import *
 import cProfile
 import pstats
@@ -52,6 +53,8 @@ def parse_arguments():
                              '[Default: 0.5]')
     parser.add_argument('--out_prefix', metavar='STR', help='Prefix for the output files.[Default: resynpyOut]',
                         default='resynpyOut')
+    parser.add_argument('--num_cpus', metavar='INT', type=int, default=4,
+                        help='Number of CPUs to use for the parallelization. [Default: 4]')
 
     variables = vars(parser.parse_args())
 
@@ -65,51 +68,10 @@ def logfile(param, string):
     return
 
 
-def pair_comparison(param, arguments):
-
-    now2 = datetime.datetime.now()
-
-    logfile(param, '==============================\n')
-    logfile(param, 'Analysis of F2 genotyping data\n')
-    logfile(param, '==============================\n\n')
-
-    logfile(param, '---------\n')
-    logfile(param, 'variables:\n')
-    logfile(param, '---------\n\n')
-
-    for k, v in arguments.items():
-        logfile(param, '\t' + k + ': ' + str(v) + '\n')
-
-    logfile(param, '\n----------\n')
-    logfile(param, 'Start time: ' + str(now2) + '\n')
-    logfile(param, '----------\n\n')
-    logfile(param, '------\n')
-    logfile(param, 'Step 1: Pairwise comparison of individuals\n')
-    logfile(param, '------\n\n')
-
-    if param.not_phased:
-        phased = 'no'
-    else:
-        phased = 'yes'
-
-    run_analysis(param.genos,
-                 param.markers,
-                 param.results_dir,
-                 scoresdict(param.scores_file),
-                 param.hetero,
-                 param.invariable,
-                 param.score_threshold,
-                 param.out_prefix,
-                 phased)
-
-    return
-
-
 def plot_pairs(param):
+    pairs = '/'.join((param.results_dir, param.out_prefix + '_selected-pairs.tab'))
+    fig_pref = param.results_dir + '/' + param.out_prefix + '_top10pairs'
 
-    pairs = '/'.join((param.results_dir, param.out_prefix+'_selected-pairs.tab'))
-    fig_pref = param.results_dir+'/'+param.out_prefix+'_top10pairs'
-    
     ind_dict = indv2genos(param.genos)
     generate_graph(ind_dict, pairs, fig_pref, param.markers)
 
@@ -146,8 +108,27 @@ def scoresdict(s_file):
     return scores_dict
 
 
+def split_list(lst, chunk_size):
+    for i in range(0, len(lst), chunk_size):
+        yield lst[i:i + chunk_size]
+
+
+def run_analysis_wrapper(args):
+    return run_analysis(*args)
+
+
+def parallel_analysis(lst, chunk_size, new_content, marker_file, ideal_score, scoresd, invar, total_score_threshold,
+                      phased):
+    chunks = list(split_list(lst, chunk_size))
+    with mp.Pool() as pool:
+        results = pool.map(run_analysis_wrapper, [(index_chunk, new_content, marker_file,
+                                                   ideal_score, scoresd, invar, total_score_threshold,
+                                                   phased) for index_chunk in chunks])
+    return results
+
+
 def main():
-    arguments, variable = parse_arguments()
+    arguments, variables = parse_arguments()
 
     if not op.exists('%s' % arguments.results_dir):
         os.makedirs('%s' % arguments.results_dir)
@@ -155,56 +136,142 @@ def main():
     if (arguments.genos and not arguments.markers) or (arguments.markers and not arguments.genos):
         sys.exit('\nExiting process...\nArguments --markers and --genos should be used together\n')
 
-    pair_comparison(arguments, variable)
+    now2 = datetime.datetime.now()
 
-    with open(op.join(arguments.results_dir, arguments.out_prefix+'_selected-pairs.tab')) as f:
-        f1 = f.readlines()
-    
-    if len(f1) != 1:
-        if sys.platform == 'win32':
-            cmd = ' '.join(('python (or python3) plot_pair_genotypes.py', '/'.join((arguments.results_dir,
-                                                                                    arguments.out_prefix +
-                                                                                    '_selected-pairs.tab')),
-                            arguments.genos, arguments.markers,
-                            arguments.results_dir + '/' + arguments.out_prefix + '_top10pairs'))
+    logfile(arguments, 'Start time: ' + str(now2) + '\n')
+    logfile(arguments, '\n')
+    logfile(arguments, '==============================\n')
+    logfile(arguments, 'Analysis of F2 genotyping data\n')
+    logfile(arguments, '==============================\n\n')
 
-            print('\nYou are using a win32 operating system!\n\n')
-            print('\tPlease remember to order manually file {}+_selected-pairs.tab, in order to have the best '
-                  'pairs on the top of the list.\n\n'.format(arguments.out_prefix))
-            print('\tAfter ordering {}+_selected-pairs.tab file, run the following command to generate the graphs for '
-                  'the top10 pairs:\n\n'.format(arguments.out_prefix))
-            print('\t\t %s' % cmd)
-        
-            end = datetime.datetime.now()
-            logfile(arguments, '--------\n')
-            logfile(arguments, 'End time: ' + str(end) + '\n')
-            logfile(arguments, '--------\n\n')
+    logfile(arguments, '---------\n')
+    logfile(arguments, 'variables:\n')
+    logfile(arguments, '---------\n\n')
 
-        else:
-            plot_pairs(arguments)
-            
-            end = datetime.datetime.now()
-            logfile(arguments, '--------\n')
-            logfile(arguments, 'End time: ' + str(end) + '\n')
-            logfile(arguments, '--------\n\n')
+    for k, v in variables.items():
+        logfile(arguments, '\t' + k + ': ' + str(v) + '\n')
+
+    logfile(arguments, '\n')
+    logfile(arguments, '------------------------------------------\n')
+    logfile(arguments, 'Step 1: Pairwise comparison of individuals\n')
+    logfile(arguments, '------------------------------------------\n\n')
+
+    if arguments.not_phased:
+        phased = 'no'
     else:
-        print('\n\t!!! Sorry...No pairs could be selected with the parameters used. Consider allowing higher '
-              'percentage of heterozygosity in your individuals and/or higher percentage of invariable sites. !!!\n')
-        logfile(arguments, "\t!!! Sorry...No pairs could be selected with the parameters used. Consider allowing "
-                           "higher percentage of heterozygosity in your individuals and/or higher percentage of "
-                           "invariable sites. !!!\n\n")
-        
+        phased = 'yes'
+
+    with open(arguments.markers) as tmp:
+        tmp1 = tmp.readlines()
+        ideal_score: int = len(tmp1)
+
+    with open(arguments.genos, "rt") as f:
+        f1 = f.readlines()
+        content = [x.rstrip('\n\r').split('\t') for x in f1]
+
+        new_content, disc_indv_list, disc_individuals = filter_hetero(content, arguments.hetero)
+
+        logfile(arguments, '\tComparison Statistics' + '\n')
+        logfile(arguments, '\t---------------------\n\n')
+        logfile(arguments, '\t\ttotal number of markers      : ' + str(ideal_score) + '\n')
+        logfile(arguments, '\t\ttotal number of individuals  : ' + str(len(content[1:])) + '\n')
+        logfile(arguments, '\t\tindividuals not meeting\n'
+                           '\t\t  heterozygosity threshold   : ' + str(disc_individuals) + '\n')
+        logfile(arguments, '\t\tindividuals to compare       : ' + str(len(new_content[1:])) + '\n')
+        logfile(arguments, '\t\tpairs to compare             : ' +
+                str((len(new_content[1:]) * (len(new_content[1:]) - 1)) / 2).split('.')[0] + '\n')
+
+        index_pairs_list = list(itertools.combinations(range(1, len(new_content)), 2))
+        final_output = parallel_analysis(lst=index_pairs_list,
+                                         chunk_size=int(len(index_pairs_list) / arguments.num_cpus),
+                                         new_content=new_content,
+                                         marker_file=arguments.markers, ideal_score=ideal_score,
+                                         scoresd=scoresdict(arguments.scores_file), invar=arguments.invariable,
+                                         total_score_threshold=arguments.score_threshold, phased=phased)
+
+        outfile = op.join(arguments.results_dir, arguments.out_prefix + '_selected-pairs.tab')
+        temp_file = op.join(arguments.results_dir, arguments.out_prefix + '.temp')
+
+    with open(temp_file, 'w') as out:
+        for i in final_output:
+            for z in i[0]:
+                out.writelines('\t'.join(z) + '\n')
+
+    a = pd.read_table(temp_file, header=None, sep='\t')
+    a.columns = ['#indiv_pair', 'score', 'invariable_pairs', 'hetero1|hetero2', 'similarity_to_hybrid',
+                 'recomb_no1', 'recomb_no2', 'sum_recomb']
+    b = a.sort_values(by=["score", "sum_recomb"], ascending=[False, True])
+    b.to_csv(outfile, index=False, sep='\t')
+
+    os.remove(temp_file)
+
+    accepted_pairs = sum([i[1] for i in final_output])
+    discarded_pairs_list = list()
+    for i in final_output:
+        for z in i[2]:
+            discarded_pairs_list.append(z)
+
+    # get unique elements from discarded_pairs_list
+    discarded_pairs_list_unique = list()
+    for elem in sorted(discarded_pairs_list):
+        if elem not in discarded_pairs_list_unique:
+            discarded_pairs_list_unique.append(elem)
+
+    discarded_pairs_score = sum([i[3] for i in final_output])
+    discarded_pairs_invar = sum([i[4] for i in final_output])
+
+    logfile(arguments, '\t\tdiscarded pairs due to score : ' +
+            str(discarded_pairs_score) + '\n')
+    logfile(arguments, '\t\tpairs not meeting invariable\n'
+                       '\t\t  site threshold             : ' +
+            str(discarded_pairs_invar) + '\n')
+    logfile(arguments, '\t\tACCEPTED PAIRS               : ' +
+            str(accepted_pairs) + '\n\n')
+
+    with open(op.join(arguments.results_dir, arguments.out_prefix + '_discarded_individuals-pairs.tab'), 'w') as disc:
+        discarded_data = disc_indv_list + discarded_pairs_list_unique
+        for a in discarded_data:
+            disc.writelines('\t'.join(a) + '\n')
+
+    # plot top-10 individuals
+    with open(outfile) as f:
+        f1 = f.readlines()
+        if len(f1) != 1:
+            if sys.platform == 'win32':
+                cmd = ' '.join(('python (or python3) plot_pair_genotypes.py', '/'.join((arguments.results_dir,
+                                                                                        arguments.out_prefix +
+                                                                                        '_selected-pairs.tab')),
+                                arguments.genos, arguments.markers,
+                                arguments.results_dir + '/' + arguments.out_prefix + '_top10pairs'))
+
+                print('\nYou are using a win32 operating system!\n\n')
+                print('\tPlease remember to order manually file {}+_selected-pairs.tab, in order to have the best '
+                      'pairs on the top of the list.\n\n'.format(arguments.out_prefix))
+                print(
+                    '\tAfter ordering {}+_selected-pairs.tab file, run the following command to generate the graphs for '
+                    'the top10 pairs:\n\n'.format(arguments.out_prefix))
+                print('\t\t %s' % cmd)
+
+                end = datetime.datetime.now()
+                logfile(arguments, '--------\n')
+                logfile(arguments, 'End time: ' + str(end) + '\n')
+                logfile(arguments, '--------\n\n')
+
+            else:
+                print('plotting top pairs')
+                plot_pairs(arguments)
+                print('plotted pairs')
+        else:
+            print('\n\t!!! Sorry...No pairs could be selected with the parameters used. Consider allowing higher '
+                  'percentage of heterozygosity in your individuals and/or higher percentage of invariable sites. !!!\n')
+            logfile(arguments, "\t!!! Sorry...No pairs could be selected with the parameters used. Consider allowing "
+                               "higher percentage of heterozygosity in your individuals and/or higher percentage of "
+                               "invariable sites. !!!\n\n")
+
         end = datetime.datetime.now()
-        logfile(arguments, '--------\n')
         logfile(arguments, 'End time: ' + str(end) + '\n')
-        logfile(arguments, '--------\n\n')
-        
+
 
 if __name__ == '__main__':
     argus, __ = parse_arguments()
-    profiler = cProfile.Profile()
-    profiler.enable()
     main()
-    profiler.disable()
-    stats = pstats.Stats(profiler).sort_stats('cumtime')
-    stats.strip_dirs()
