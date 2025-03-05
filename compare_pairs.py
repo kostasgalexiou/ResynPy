@@ -6,8 +6,6 @@ Created on {8/21/18}
 """
 
 import collections
-import itertools
-import time
 import warnings
 
 import pandas as pd
