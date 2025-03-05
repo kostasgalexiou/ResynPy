@@ -13,8 +13,6 @@ import os.path as op
 import datetime
 import multiprocessing as mp
 from plot_pair_genotypes import *
-import cProfile
-import pstats
 from compare_pairs import *
 
 
