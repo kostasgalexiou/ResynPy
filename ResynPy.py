@@ -7,6 +7,7 @@ Created on '7/03/19'
 """
 
 import argparse
+import itertools
 import os
 import sys
 import os.path as op
