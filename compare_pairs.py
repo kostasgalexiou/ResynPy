@@ -27,7 +27,7 @@ def filter_hetero(content, hetero_threshold):
     disc_list = list()
     d_individuals = 0
     for g in content:
-        geno_with_info = [x.upper() for x in g if x != '-']
+        geno_with_info = [x for x in g if x != '-']
         hetero_count = geno_with_info.count('H')
         hetero_ratio = float(hetero_count) / float(len(geno_with_info))
 
