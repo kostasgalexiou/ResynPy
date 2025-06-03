@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Created on '7/03/19'
-
 @author: 'kalexiou'
 """
 
@@ -187,7 +185,6 @@ def main():
                                          marker_file=arguments.markers, ideal_score=ideal_score,
                                          scoresd=scoresdict(arguments.scores_file), invar=arguments.invariable,
                                          total_score_threshold=arguments.score_threshold, phased=phased)
-
         outfile = op.join(arguments.results_dir, arguments.out_prefix + '_selected-pairs.tab')
         temp_file = op.join(arguments.results_dir, arguments.out_prefix + '.temp')
 
@@ -197,6 +194,7 @@ def main():
                 out.writelines('\t'.join(z) + '\n')
 
     a = pd.read_table(temp_file, header=None, sep='\t')
+
     a.columns = ['#indiv_pair', 'score', 'invariable_pairs', 'hetero1|hetero2', 'similarity_to_hybrid',
                  'recomb_no1', 'recomb_no2', 'sum_recomb']
     b = a.sort_values(by=["score", "sum_recomb"], ascending=[False, True])
@@ -209,13 +207,7 @@ def main():
     for i in final_output:
         for z in i[2]:
             discarded_pairs_list.append(z)
-
-    # get unique elements from discarded_pairs_list
-    discarded_pairs_list_unique = list()
-    for elem in sorted(discarded_pairs_list):
-        if elem not in discarded_pairs_list_unique:
-            discarded_pairs_list_unique.append(elem)
-
+    
     discarded_pairs_score = sum([i[3] for i in final_output])
     discarded_pairs_invar = sum([i[4] for i in final_output])
 
@@ -228,7 +220,7 @@ def main():
             str(accepted_pairs) + '\n\n')
 
     with open(op.join(arguments.results_dir, arguments.out_prefix + '_discarded_individuals-pairs.tab'), 'w') as disc:
-        discarded_data = disc_indv_list + discarded_pairs_list_unique
+        discarded_data = disc_indv_list + discarded_pairs_list
         for a in discarded_data:
             disc.writelines('\t'.join(a) + '\n')
 
@@ -236,30 +228,9 @@ def main():
     with open(outfile) as f:
         f1 = f.readlines()
         if len(f1) != 1:
-            if sys.platform == 'win32':
-                cmd = ' '.join(('python (or python3) plot_pair_genotypes.py', '/'.join((arguments.results_dir,
-                                                                                        arguments.out_prefix +
-                                                                                        '_selected-pairs.tab')),
-                                arguments.genos, arguments.markers,
-                                arguments.results_dir + '/' + arguments.out_prefix + '_top10pairs'))
-
-                print('\nYou are using a win32 operating system!\n\n')
-                print('\tPlease remember to order manually file {}+_selected-pairs.tab, in order to have the best '
-                      'pairs on the top of the list.\n\n'.format(arguments.out_prefix))
-                print(
-                    '\tAfter ordering {}+_selected-pairs.tab file, run the following command to generate the graphs for '
-                    'the top10 pairs:\n\n'.format(arguments.out_prefix))
-                print('\t\t %s' % cmd)
-
-                end = datetime.datetime.now()
-                logfile(arguments, '--------\n')
-                logfile(arguments, 'End time: ' + str(end) + '\n')
-                logfile(arguments, '--------\n\n')
-
-            else:
-                print('plotting top pairs')
-                plot_pairs(arguments)
-                print('plotted pairs')
+            print('plotting top pairs')
+            plot_pairs(arguments)
+            print('plotted pairs')
         else:
             print('\n\t!!! Sorry...No pairs could be selected with the parameters used. Consider allowing higher '
                   'percentage of heterozygosity in your individuals and/or higher percentage of invariable sites. !!!\n')
