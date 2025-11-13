@@ -189,14 +189,13 @@ def main():
         temp_file = op.join(arguments.results_dir, arguments.out_prefix + '.temp')
 
     with open(temp_file, 'w') as out:
+        out.writelines('\t'.join(('#indiv_pair', 'score', 'invariable_pairs', 'hetero1|hetero2', 'similarity_to_hybrid',
+                 'recomb_no1', 'recomb_no2', 'sum_recomb\n')))
         for i in final_output:
             for z in i[0]:
                 out.writelines('\t'.join(z) + '\n')
 
-    a = pd.read_table(temp_file, header=None, sep='\t')
-
-    a.columns = ['#indiv_pair', 'score', 'invariable_pairs', 'hetero1|hetero2', 'similarity_to_hybrid',
-                 'recomb_no1', 'recomb_no2', 'sum_recomb']
+    a = pd.read_table(temp_file, header=0, sep='\t')
     b = a.sort_values(by=["score", "sum_recomb"], ascending=[False, True])
     b.to_csv(outfile, index=False, sep='\t')
 
