@@ -83,8 +83,10 @@ def get_indv_colors(ind_genos, white_pos):
 
 def generate_graph(indv_dict, pairs, figname_prefix, markers):
 
-    all_markers, white, chromosomes = get_total_markers(markers)
+    all_markers, white, chroms = get_total_markers(markers)
 
+    chromosomes = sorted([int(x) for x in chroms])
+    
     with open(pairs) as f:
 
         f1 = f.readlines()
