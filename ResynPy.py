@@ -202,6 +202,9 @@ def main():
     os.remove(temp_file)
 
     accepted_pairs = sum([i[1] for i in final_output])
+
+    print('%d pairs were selected' % accepted_pairs)
+    
     discarded_pairs_list = list()
     for i in final_output:
         for z in i[2]:
